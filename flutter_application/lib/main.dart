@@ -43,18 +43,10 @@ class _CameraAppState extends State<CameraApp> {
     if (!controller.value.isInitialized) {
       return Container();
     }
-    return Container(
-      margin: const EdgeInsets.all(10.0),
-      child: SizedBox(
-        width: 60.0,
-        height: 60.0,
-        child: MaterialApp(
-          home: CameraPreview(controller),
-        ),
-      ),
-      color: Colors.pink,
-      width: 2.0,
-      height: 2.0,
-    );
+    return MaterialApp(
+        title: "lol",
+        home: Scaffold(
+            appBar: AppBar(title: const Text("Welcome")),
+            body: Center(child: CameraPreview(controller))));
   }
 }
