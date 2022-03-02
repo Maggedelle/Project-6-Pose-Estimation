@@ -30,7 +30,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       // Get a specific camera from the list of available cameras.
       widget.camera,
       // Define the resolution to use.
-      ResolutionPreset.max,
+      ResolutionPreset.medium,
     );
 
     // Next, initialize the controller. This returns a Future.
@@ -47,7 +47,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Take a picture')),
+      appBar: AppBar(
+        title: const Text('Fitness App'),
+        foregroundColor: Colors.red,
+      ),
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
       // controller has finished initializing.
@@ -62,6 +65,23 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             return const Center(child: CircularProgressIndicator());
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white70,
+        splashColor: Colors.yellow,
+        // Provide an onPressed callback.
+        onPressed: () async {
+          // Take the Picture in a try / catch block. If anything goes wrong,
+          // catch the error.
+          try {} catch (e) {
+            // If an error occurs, log the error to the console.
+            print(e);
+          }
+        },
+        child: const Icon(
+          Icons.wine_bar,
+          color: Colors.redAccent,
+        ),
       ),
     );
   }
