@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -16,13 +17,34 @@ Future<void> main() async {
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
 
-  runApp(
-    MaterialApp(
-      theme: ThemeData.dark(),
-      home: TakePictureScreen(
-        // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: firstCamera,
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        home: Scaffold(
+      appBar: AppBar(
+        title: Text("Exercises"),
+        backgroundColor: Color.fromARGB(255, 65, 75, 80),
       ),
-    ),
-  );
+      body: Center(
+        child: Column(children: [
+          Padding(padding: EdgeInsets.all(10.0)),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text("hej ebbi"),
+            style: ElevatedButton.styleFrom(fixedSize: Size(200, 100)),
+          ),
+          Padding(padding: EdgeInsets.all(10.0)),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text("hej Mulle"),
+            style: ElevatedButton.styleFrom(fixedSize: Size(200, 100)),
+          ),
+        ]),
+      ),
+    ));
+  }
 }
