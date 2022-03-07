@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+bool debug = false;
+
 // A screen that allows users to take a picture using a given camera.
-class TakePictureScreen extends StatefulWidget {
-  const TakePictureScreen({
+class CameraScreen extends StatefulWidget {
+  const CameraScreen({
     Key? key,
     required this.camera,
   }) : super(key: key);
@@ -14,10 +16,10 @@ class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
 
   @override
-  TakePictureScreenState createState() => TakePictureScreenState();
+  CameraScreenState createState() => CameraScreenState();
 }
 
-class TakePictureScreenState extends State<TakePictureScreen> {
+class CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
@@ -30,9 +32,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       // Get a specific camera from the list of available cameras.
       widget.camera,
       // Define the resolution to use.
-      ResolutionPreset.medium,
+      ResolutionPreset.max,
     );
-
     // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
   }
@@ -42,6 +43,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     // Dispose of the controller when the widget is disposed.
     _controller.dispose();
     super.dispose();
+  }
+
+  void cameraBytesToDetector({required CameraController camera}) {
+    camera.startImageStream((image) {});
   }
 
   @override
@@ -59,7 +64,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // If the Future is complete, display the preview.
-            return CameraPreview(_controller);
+            return debug
+                ? AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: CameraPreview(_controller))
+                : CameraPreview(_controller);
           } else {
             // Otherwise, display a loading indicator.
             return const Center(child: CircularProgressIndicator());
@@ -67,10 +76,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white70,
+        backgroundColor: Color.fromARGB(255, 1, 148, 247),
         splashColor: Colors.yellow,
         // Provide an onPressed callback.
         onPressed: () async {
+          setState(() {
+            debug ? debug = false : debug = true;
+          });
+          print(debug);
           // Take the Picture in a try / catch block. If anything goes wrong,
           // catch the error.
           try {} catch (e) {
@@ -79,8 +92,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           }
         },
         child: const Icon(
-          Icons.wine_bar,
-          color: Colors.redAccent,
+          Icons.display_settings,
+          color: Colors.black54,
         ),
       ),
     );
