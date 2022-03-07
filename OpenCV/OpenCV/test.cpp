@@ -19,6 +19,6 @@ int main() {
 		imshow("Image", img);
 		Mat frame;
 		
-		waitKey(20);
+			waitKey(20);
 	}
 }
