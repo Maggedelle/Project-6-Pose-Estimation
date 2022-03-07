@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CameraScreen extends StatelessWidget {
-  const CameraScreen({Key? key}) : super(key: key);
+class CameraPage extends StatelessWidget {
+  const CameraPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

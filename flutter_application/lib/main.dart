@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/camera.dart';
-import 'package:flutter_application/cameraScreen/cameraScreen.dart';
+import 'package:flutter_application/cameraPage/cameraPage.dart';
 import 'package:flutter_application/homeScreen/homeScreen.dart';
 
 void main() async {
@@ -24,9 +24,7 @@ void main() async {
     initialRoute: '/',
     routes: {
       '/': (context) => const HomeScreen(),
-      '/cameraScreen': (context) => const CameraScreen()
+      '/cameraScreen': (context) => const CameraPage()
     },
   ));
 }
-
-
