@@ -113,6 +113,8 @@ class _DetectionPageState extends State<DetectionPage> with WidgetsBindingObserv
       return;
     }
 
+    
+
     // convert arucos from camera frame coords to screen coords
     final arucos = res.map((x) => x * _camFrameToScreenScale).toList(growable: false);
     setState(() {

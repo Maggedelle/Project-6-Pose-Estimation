@@ -10,6 +10,10 @@ import 'package:flutter_application/cameraPage/cameraPage.dart';
 import 'package:flutter_application/homeScreen/homeScreen.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  NativeOpenCv nativeOpenCv = NativeOpenCv();
+  print(nativeOpenCv.cvVersion());
  runApp(MaterialApp(
     title: "Exercise Correction - Pose Estimateion",
     initialRoute: '/',
