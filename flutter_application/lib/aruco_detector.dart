@@ -75,11 +75,11 @@ class _ArucoDetector {
     init(markerPng);
   }
 
-  init(ByteData markerPng) async { //bliver ikke brugt, men kan blive relevant.
-    //final pngBytes = markerPng.buffer.asUint8List();
+  init(ByteData markerPng) async { 
+    final pngBytes = markerPng.buffer.asUint8List();
 
     // init the detector
-    //_nativeOpencv = NativeOpenCv();
+    _nativeOpencv = NativeOpenCv();
     //_nativeOpencv!.initDetector(pngBytes, 36);
   }
 

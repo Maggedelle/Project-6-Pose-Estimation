@@ -39,6 +39,7 @@ class NativeOpenCv {
     var vSize = vBuffer?.lengthInBytes ?? 0;
     var totalSize = ySize + uSize + vSize;
 
+
     _imageBuffer ??= malloc.allocate<Uint8>(totalSize);
 
     // We always have at least 1 plane, on Android it si the yPlane on iOS its the rgba plane

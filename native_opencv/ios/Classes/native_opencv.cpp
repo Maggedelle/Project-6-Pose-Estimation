@@ -16,6 +16,7 @@ const char* version() {
     return CV_VERSION;
 }
 
+__attribute__((visibility("default"))) __attribute__((used))
 const float* rect(int width, int height, int rotation, uint8_t* bytes, bool isYUV, int32_t* outCount) {
     Mat frame;
     if (isYUV) {

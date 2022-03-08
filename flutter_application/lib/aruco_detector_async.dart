@@ -14,12 +14,12 @@ class ArucoDetectorAsync {
   final Map<int, Completer> _cbs = {};
 
   ArucoDetectorAsync() {
-    //_initDetectionThread();
+    _initDetectionThread();
   }
 
-  void _initDetectionThread() async { //vi bruger ikke denne funktion, men den kan blive relevant :)
+  void _initDetectionThread() async { 
     // Create the port on which the detector thread will send us messages and listen to it.
-   /* ReceivePort fromDetectorThread = ReceivePort();
+   ReceivePort fromDetectorThread = ReceivePort();
     fromDetectorThread.listen(_handleMessage, onDone: () {
       arThreadReady = false;
     });
@@ -29,7 +29,7 @@ class ArucoDetectorAsync {
     final bytes = await rootBundle.load('assets/drawable/marker.png');
     final initReq = aruco_detector.InitRequest(toMainThread: fromDetectorThread.sendPort, markerPng: bytes);
     _detectorThread = await Isolate.spawn(aruco_detector.init, initReq);
-    */
+   
   }
 
   Future<Float32List?> detect(CameraImage image, int rotation) {
@@ -67,5 +67,24 @@ class ArucoDetectorAsync {
     // Wait for the detector to acknoledge the destory and kill the thread
     await res.future;
     _detectorThread.kill();
+  }
+    void _handleMessage(data) {
+    // The detector thread send us its SendPort on init, if we got it this meand the detector is ready
+    if (data is SendPort) {
+      _toDetectorThread = data;
+      arThreadReady = true;
+      return;
+    }
+
+    // Make sure we got a Response object
+    if (data is aruco_detector.Response) {
+      // Find the Completer associated with this request and resolve it
+      var reqId = data.reqId;
+      _cbs[reqId]?.complete(data.data);
+      _cbs.remove(reqId);
+      return;
+    }
+
+    log('Unknown message from ArucoDetector, got: $data');
   }
 }

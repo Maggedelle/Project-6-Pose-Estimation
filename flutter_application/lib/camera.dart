@@ -106,7 +106,7 @@ class _DetectionPageState extends State<DetectionPage> with WidgetsBindingObserv
     if (!mounted || res == null || res.isEmpty) {
       return;
     }
-
+    log("længde " + res.length.toString());
     // Check that the number of coords we got divides by 8 exactly, each aruco has 8 coords (4 corners x/y)
     if ((res.length / 8) != (res.length ~/ 8)) {
       log('Got invalid response from ArucoDetector, number of coords is ${res.length} and does not represent complete arucos with 4 corners');
