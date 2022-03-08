@@ -33,7 +33,7 @@ class NativeOpenCv {
   }
 
   Float32List cvRect(int width, int height, int rotation, Uint8List yBuffer,
-      Uint8List? uBuffer, Uint8List vBuffer) {
+      Uint8List? uBuffer, Uint8List? vBuffer) {
     var ySize = yBuffer.lengthInBytes;
     var uSize = uBuffer?.lengthInBytes ?? 0;
     var vSize = vBuffer?.lengthInBytes ?? 0;

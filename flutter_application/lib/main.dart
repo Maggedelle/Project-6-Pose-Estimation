@@ -1,34 +1,46 @@
-import 'dart:async';
-import 'dart:typed_data';
+import 'dart:developer';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter_application/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:native_opencv/native_opencv.dart';
+import 'package:flutter_application/camera.dart';
 
-Future<void> main() async {
-  // Ensure that plugin services are initialized so that `availableCameras()`
-  // can be called before `runApp()`
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-  final nativeOpencv = NativeOpenCv();
+  runApp(const OpenCVApp());
+}
 
-  print("opencv version is " + nativeOpencv.cvVersion());
+class OpenCVApp extends StatelessWidget {
+  const OpenCVApp({Key? key}) : super(key: key);
 
-  // Obtain a list of the available cameras on the device.
-  final cameras = await availableCameras();
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'Flutter Demo',
+      home: HomePage(),
+    );
+  }
+}
 
-  // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.first;
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
 
-  runApp(
-    MaterialApp(
-      theme: ThemeData.dark(),
-      home: CameraScreen(
-        // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: firstCamera,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Center(
+        child: ElevatedButton(
+          child: const Text('Camera'),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
+              return const DetectionPage();
+            }));
+          },
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

@@ -27,10 +27,14 @@ const float* rect(int width, int height, int rotation, uint8_t* bytes, bool isYU
 
     vector<float> output;
 
-    output.push_back(10.0);
-    output.push_back(20.0);
+    output.push_back(100.0);
+    output.push_back(300.0);
     output.push_back(400.0);
     output.push_back(500.0);
+    output.push_back(800.0);
+    output.push_back(200.0);
+    output.push_back(100.0);
+    output.push_back(200.0);
 
     unsigned int total = sizeof(float) * output.size();
     float* jres = (float*)malloc(total);
