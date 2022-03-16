@@ -36,7 +36,7 @@ class CameraScreenState extends State<CameraScreen> {
       // Get a specific camera from the list of available cameras.
       widget.camera,
       // Define the resolution to use.
-      ResolutionPreset.low,
+      ResolutionPreset.medium,
     );
     // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize(); 
@@ -69,7 +69,6 @@ class CameraScreenState extends State<CameraScreen> {
 
   void _processCameraImage(CameraImage image) async {
     
-    print("haha");
     if(!sentImage){
       final imageBytes = await convertImagetoPng(image);
 
