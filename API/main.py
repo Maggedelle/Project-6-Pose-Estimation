@@ -1,18 +1,36 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 import uvicorn
-from pydantic import BaseModel
-from typing import Optional
 import poseEstimation
-
-class Data(BaseModel):
-    byteData:Optional[str] = None;
-
-app = FastAPI()
+import json
+app = FastAPI(title='ESMA API')
 
 
-@app.post("/")
-async def queryLemma(data: Data):
-    await poseEstimation.receivedFrameData(data.byteData);
-    
+class connection:
+    def __init__(self, id):
+        self.id = id
+    id: str
+    currFrame: str
+
+
+connections = []
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+
+    while True:
+        try:
+            data = await websocket.receive_json()
+            if(data["type"] == "init"):
+                connections.append(connection(data["id"]))
+            else:
+                await poseEstimation.receivedFrameData(data["frame"])
+
+        except Exception as e:
+            print("error: ", e)
+            break
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5000)
