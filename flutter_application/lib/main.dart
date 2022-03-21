@@ -21,7 +21,7 @@ void main() async {
   final cameras = await availableCameras();
 
   final channel = WebSocketChannel.connect(
-    Uri.parse('ws://172.25.20.235:5000/ws'),
+    Uri.parse('ws://192.168.87.181:5000/ws'),
   );
 
   channel.stream.listen(
