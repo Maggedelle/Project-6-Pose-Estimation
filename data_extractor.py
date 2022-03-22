@@ -4,6 +4,15 @@ import time
 import calculator as calc
 import toJSON
 
+WRIST_LEFT = 15
+WRIST_RIGHT = 16
+ELBOW_LEFT = 13
+ELBOW_RIGHT = 14
+SHOULDER_LEFT = 11
+SHOULDER_RIGHT = 12
+HIP_LEFT = 23
+HIP_RIGHT = 24
+
 
 def list_coordinates(img, landmarks):
     poselist = []
@@ -16,12 +25,10 @@ def list_coordinates(img, landmarks):
 
 
 list_data_type = ['arm_angle', 'upperback_angle']
-mp_draw = mp.solutions.drawing_utils
 mppose = mp.solutions.pose
 pose = mppose.Pose()
 angle_list = []
 deviation_list = []
-time_b = 0
 
 for i in range(6):
     cap = cv2.VideoCapture(f'dataset/{i}.wmv')
@@ -32,30 +39,11 @@ for i in range(6):
             result = pose.process(imgRGB)
 
             if result.pose_landmarks:
-                mp_draw.draw_landmarks(img, result.pose_landmarks,
-                                       mppose.POSE_CONNECTIONS)
                 plist = list_coordinates(img, result.pose_landmarks.landmark)
-
-                cv2.putText(img, str(int(calc.angle(plist[15], plist[13], plist[11]))), (plist[13][1] - 50, plist[13][2] + 30),
-                            cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-                # cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
-                # cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-                # cv2.putText(img, str(int(calc_angle(plist[24], plist[12], plist[14]))), (plist[12][1] - 50, plist[12][2] + 30),
-                # cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-                # cv2.putText(img, str(int(calc_angle(plist[12], plist[14], plist[16]))), (plist[14][1] - 50, plist[14][2] + 30),
-                # cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-
-                deviation_list.append(calc.devation(plist[11], plist[23]))
-                angle_list.append(calc.angle(plist[15], plist[13], plist[11]))
-
-            time_a = time.time()
-            fps = 1/(time_a-time_b)
-            time_b = time_a
-
-            cv2.putText(img, "fps: " + str(int(fps)), (70, 50),
-                        cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 0), 3)
-            #cv2.imshow("Image", img)
-            # cv2.waitKey(10)
+                deviation_list.append(calc.devation(
+                    plist[SHOULDER_LEFT], plist[HIP_LEFT]))
+                angle_list.append(calc.angle(
+                    plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT]))
 
         except Exception as e:
             print(e)

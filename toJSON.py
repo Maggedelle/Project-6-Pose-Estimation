@@ -10,3 +10,9 @@ def add_data(json_list, index, angle_type):
 
     with open("dataset/labels.json", "w") as file:
         json.dump(data, file)
+
+
+def read_data(index):
+    with open("dataset/labels.json", "r+") as file:
+        data = json.load(file)
+    return data['labels'][index]
