@@ -1,142 +1,206 @@
-import 'dart:developer';
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:image/image.dart' as imglib;
+import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/detectionslayer.dart';
-import 'package:flutter_application/aruco_detector_async.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
-class DetectionPage extends StatefulWidget {
-  const DetectionPage({Key? key}) : super(key: key);
+bool debug = false;
+bool sentImage = false;
 
+// A screen that allows users to take a picture using a given camera.
+class CameraScreen extends StatefulWidget {
+  const CameraScreen({
+    Key? key,
+    required this.camera,
+    required this.channel,
+    required this.id,
+  }) : super(key: key);
+
+  final CameraDescription camera;
+  final WebSocketChannel channel;
+  final String id;
   @override
-  _DetectionPageState createState() => _DetectionPageState();
+  CameraScreenState createState() => CameraScreenState();
 }
 
-class _DetectionPageState extends State<DetectionPage> with WidgetsBindingObserver {
-  CameraController? _camController;
-  late ArucoDetectorAsync _arucoDetector;
-  int _camFrameRotation = 0;
-  double _camFrameToScreenScale = 0;
-  int _lastRun = 0;
-  bool _detectionInProgress = false;
-  List<double> _arucos = List.empty();
+class CameraScreenState extends State<CameraScreen> {
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
-    _arucoDetector = ArucoDetectorAsync();
+    // To display the current output from the Camera,
+    // create a CameraController.
+    _controller = CameraController(
+      // Get a specific camera from the list of available cameras.
+      widget.camera,
+      // Define the resolution to use.
+      ResolutionPreset.low,
+    );
+    // Next, initialize the controller. This returns a Future.
+    _initializeControllerFuture = _controller.initialize();
     initCamera();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController? cameraController = _camController;
+  Future<void> initCamera() async {
+    try {
+      await _initializeControllerFuture;
 
-    // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
-
-    if (state == AppLifecycleState.inactive) {
-      cameraController.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      initCamera();
+      cameraBytesToDetector(camera: _controller);
+    } catch (e) {
+      print(e);
     }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
-    _camController?.dispose();
+    // Dispose of the controller when the widget is disposed.
+    _controller.dispose();
+    widget.channel.sink.close();
     super.dispose();
   }
 
-  Future<void> initCamera() async {
-    final cameras = await availableCameras();
-    var idx = cameras.indexWhere((c) => c.lensDirection == CameraLensDirection.back);
-    if (idx < 0) {
-      log("No Back camera found - weird");
-      return;
-    }
-
-    var desc = cameras[idx];
-    _camFrameRotation = Platform.isAndroid ? desc.sensorOrientation : 0;
-    _camController = CameraController(
-      desc,
-      ResolutionPreset.high, // 720p
-      enableAudio: false,
-      imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.yuv420 : ImageFormatGroup.bgra8888,
-    );
-
-    try {
-      await _camController!.initialize();
-      await _camController!.startImageStream((image) => _processCameraImage(image));
-    } catch (e) {
-      log("Error initializing camera, error: ${e.toString()}");
-    }
-
-    if (mounted) {
-      setState(() {});
-    }
+  void cameraBytesToDetector({required CameraController camera}) {
+    camera.startImageStream((image) => _processCameraImage(image));
   }
 
   void _processCameraImage(CameraImage image) async {
-    if (_detectionInProgress || !mounted || DateTime.now().millisecondsSinceEpoch - _lastRun < 30) {
-      return;
+    if (!sentImage) {
+      final imageBytes = await convertImagetoPng(image);
+
+      //Uint8List bytes = image.planes[1].bytes;
+
+      sendBytes(base64.encode(imageBytes!));
+      //sendBytes(bytes);
+      sentImage = true;
+      sleep1();
+    }
+  }
+
+  Future sleep1() {
+    return new Future.delayed(
+        const Duration(milliseconds: 100), () => sentImage = false);
+  }
+
+  Future<List<int>?> convertImagetoPng(CameraImage image) async {
+    try {
+      imglib.Image img;
+      if (image.format.group == ImageFormatGroup.yuv420) {
+        img = _convertYUV420(image);
+      } else {
+        img = _convertBGRA8888(image);
+      }
+
+      imglib.PngEncoder pngEncoder = new imglib.PngEncoder();
+
+      // Convert to png
+      List<int> png = pngEncoder.encodeImage(img);
+      return png;
+    } catch (e) {
+      print(">>>>>>>>>>>> ERROR:" + e.toString());
+    }
+    return null;
+  }
+
+// CameraImage BGRA8888 -> PNG
+// Color
+  imglib.Image _convertBGRA8888(CameraImage image) {
+    return imglib.Image.fromBytes(
+      image.width,
+      image.height,
+      image.planes[0].bytes,
+      format: imglib.Format.bgra,
+    );
+  }
+
+// CameraImage YUV420_888 -> PNG -> Image (compresion:0, filter: none)
+// Black
+  imglib.Image _convertYUV420(CameraImage image) {
+    var img = imglib.Image(image.width, image.height); // Create Image buffer
+
+    Plane plane = image.planes[0];
+    const int shift = (0xFF << 24);
+
+    // Fill image buffer with plane[0] from YUV420_888
+    for (int x = 0; x < image.width; x++) {
+      for (int planeOffset = 0;
+          planeOffset < image.height * image.width;
+          planeOffset += image.width) {
+        final pixelColor = plane.bytes[planeOffset + x];
+        // color: 0x FF  FF  FF  FF
+        //           A   B   G   R
+        // Calculate pixel color
+        var newVal =
+            shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
+
+        img.data[planeOffset + x] = newVal;
+      }
     }
 
-    // calc the scale factor to convert from camera frame coords to screen coords.
-    // NOTE!!!! We assume camera frame takes the entire screen width, if that's not the case
-    // (like if camera is landscape or the camera frame is limited to some area) then you will
-    // have to find the correct scale factor somehow else
-    if (_camFrameToScreenScale == 0) {
-      var w = (_camFrameRotation == 0 || _camFrameRotation == 180) ? image.width : image.height;
-      _camFrameToScreenScale = MediaQuery.of(context).size.width / w;
+    return img;
+  }
+
+  Future<void> sendBytes(String bytes) async {
+    try {
+      widget.channel.sink.add(
+          json.encode({"frame": bytes, "id": widget.id, "type": "sendImage"}));
+    } catch (e) {
+      print("ERROR: " + e.toString());
     }
-
-    // Call the detector
-    _detectionInProgress = true;
-    var res = await _arucoDetector.detect(image, _camFrameRotation);
-    _detectionInProgress = false;
-    _lastRun = DateTime.now().millisecondsSinceEpoch;
-
-    // Make sure we are still mounted, the background thread can return a response after we navigate away from this
-    // screen but before bg thread is killed
-    if (!mounted || res == null || res.isEmpty) {
-      return;
-    }
-    log("længde " + res.length.toString());
-    // Check that the number of coords we got divides by 8 exactly, each aruco has 8 coords (4 corners x/y)
-    if ((res.length / 8) != (res.length ~/ 8)) {
-      log('Got invalid response from ArucoDetector, number of coords is ${res.length} and does not represent complete arucos with 4 corners');
-      return;
-    }
-
-    
-
-    // convert arucos from camera frame coords to screen coords
-    final arucos = res.map((x) => x * _camFrameToScreenScale).toList(growable: false);
-    setState(() {
-      _arucos = arucos;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_camController == null) {
-      return const Center(
-        child: Text('Loading...'),
-      );
-    }
-
-    return Stack(
-      children: [
-        CameraPreview(_camController!),
-        DetectionsLayer(
-          arucos: _arucos,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Fitness App'),
+        foregroundColor: Colors.red,
+      ),
+      // You must wait until the controller is initialized before displaying the
+      // camera preview. Use a FutureBuilder to display a loading spinner until the
+      // controller has finished initializing.
+      body: FutureBuilder<void>(
+        future: _initializeControllerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // If the Future is complete, display the preview.
+            return debug
+                ? AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: CameraPreview(_controller))
+                : CameraPreview(_controller);
+          } else {
+            // Otherwise, display a loading indicator.
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Color.fromARGB(255, 1, 148, 247),
+        splashColor: Colors.yellow,
+        // Provide an onPressed callback.
+        onPressed: () async {
+          setState(() {
+            debug ? debug = false : debug = true;
+          });
+          print(debug);
+          // Take the Picture in a try / catch block. If anything goes wrong,
+          // catch the error.
+          try {} catch (e) {
+            // If an error occurs, log the error to the console.
+            print(e);
+          }
+        },
+        child: const Icon(
+          Icons.display_settings,
+          color: Colors.black54,
         ),
-      ],
+      ),
     );
   }
 }
