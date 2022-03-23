@@ -60,7 +60,7 @@ while True:
                     cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
         cv2.putText(img, str(int(calc_angle(plist[13], plist[11], plist[23]))), (plist[11][1] - 50, plist[11][2] + 30),
                     cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-                    
+
         print(calc_angle(plist[24], plist[26], plist[28]))
         print(plist)
 
