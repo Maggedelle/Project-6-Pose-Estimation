@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-import time
 import calculator as calc
 import toJSON
 
@@ -88,7 +87,7 @@ for i in range(LABELS_LENGHT):
             for lists in master_list:
                 lists.clear()
 
-            print(f"Processing: [{i+1}/{LABELS_LENGHT}]")
+            print(f"Processing [{i+1}/{LABELS_LENGHT}]")
             if i+1 == LABELS_LENGHT:
                 print("Done! :)")
             break
