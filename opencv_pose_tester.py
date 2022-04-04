@@ -3,7 +3,18 @@ import mediapipe as mp
 import time
 import math
 import numpy as np
-
+WRIST_LEFT = 15
+WRIST_RIGHT = 16
+ELBOW_LEFT = 13
+ELBOW_RIGHT = 14
+SHOULDER_LEFT = 11
+SHOULDER_RIGHT = 12
+HIP_LEFT = 23
+HIP_RIGHT = 24
+KNEE_LEFT = 25
+KNEE_RIGHT = 26
+ANKLE_LEFT = 27
+ANKLE_RIGHT = 28
 
 def calc_angle(p1, p2, p3):
     vector_ab = p1[1] - p2[1], p1[2] - p2[2]
@@ -39,8 +50,8 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-#cap = cv2.VideoCapture('posetest.mp4')
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('dataset/14.wmv')
+#cap = cv2.VideoCapture(0)
 time_b = 0
 while True:
     success, img = cap.read()
@@ -52,14 +63,15 @@ while True:
                                mppose.POSE_CONNECTIONS)
         plist = list_coordinates(img, result.pose_landmarks.landmark)
 
-        cv2.putText(img, str(int(calc_angle(plist[24], plist[26], plist[28]))), (plist[26][1] - 50, plist[26][2] + 30),
+        cv2.putText(img, str(int(calc_angle(
+                       plist[SHOULDER_LEFT],  plist[ELBOW_LEFT], plist[WRIST_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
                     cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-        cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
-                    cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-        cv2.putText(img, str(int(calc_angle(plist[24], plist[12], plist[14]))), (plist[12][1] - 50, plist[12][2] + 30),
-                    cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-        cv2.putText(img, str(int(calc_angle(plist[13], plist[11], plist[23]))), (plist[11][1] - 50, plist[11][2] + 30),
-                    cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
+      #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
+       #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
+       # cv2.putText(img, str(int(calc_angle(plist[24], plist[12], plist[14]))), (plist[12][1] - 50, plist[12][2] + 30),
+        #            cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
+        #cv2.putText(img, str(int(calc_angle(plist[13], plist[11], plist[23]))), (plist[11][1] - 50, plist[11][2] + 30),
+         #           cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
 
         print(calc_angle(plist[24], plist[26], plist[28]))
         print(plist)
