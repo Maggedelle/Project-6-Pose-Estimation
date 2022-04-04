@@ -50,7 +50,7 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-cap = cv2.VideoCapture('dataset/0.wmv')
+cap = cv2.VideoCapture('dataset/14.wmv')
 #cap = cv2.VideoCapture(0)
 time_b = 0
 while True:
@@ -63,7 +63,8 @@ while True:
                                mppose.POSE_CONNECTIONS)
         plist = list_coordinates(img, result.pose_landmarks.landmark)
 
-        cv2.putText(img, str(int(calc_angle(plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
+        cv2.putText(img, str(int(calc_angle(
+                       plist[SHOULDER_LEFT],  plist[ELBOW_LEFT], plist[WRIST_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
                     cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
       #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
        #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))

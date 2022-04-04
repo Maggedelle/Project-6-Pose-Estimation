@@ -36,7 +36,7 @@ pose = mppose.Pose()
 arm_angle_list, back_deviation_list, shoulder_angle_list, back_angle_list = [], [], [], []
 master_list = [arm_angle_list, back_deviation_list,
                shoulder_angle_list, back_angle_list]
-lolleren = 0
+totalAmountFound = 0
 
 def calculateTimestampByFrame (frame):
     i = 0
@@ -48,22 +48,18 @@ def calculateTimestampByFrame (frame):
             sec=math.ceil(sec)
     return sec
 
-
+#LABELS_LENGHT
 for i in range(LABELS_LENGHT):
     exerice = toJSON.find_exercise(i)
-    cap = cv2.VideoCapture(f'dataset/{i}.wmv')
+    cap = cv2.VideoCapture(f'C:/P6/Project-6-Pose-Estimation/dataset/{i}.wmv')
     frame = 0
     prevTime = 0
-    prevAngle = None
-    falling = False
-    
-
-    stiger = 0
-    falder = 0
+    hasBeenUp = False
     #30 frames persecond
     while True:
         frame +=1
         success, img = cap.read()
+        
         try:
             imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             result = pose.process(imgRGB)
@@ -76,47 +72,72 @@ for i in range(LABELS_LENGHT):
                     back_deviation_list.append(calc.devation(
                         p[SHOULDER_LEFT], p[HIP_LEFT]))
 
-                    if prevAngle != None and prevAngle > arm_angle and stiger > 15:
-                        falling = True
-                        sec = calculateTimestampByFrame(frame)
+                    if hasBeenUp and arm_angle > 160:
+                        sec = frame / 24;
                         input_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/" + str(i) + ".wmv"
-                        output_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(lolleren) + ".mp4" 
+                        output_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(totalAmountFound) + ".mp4" 
+                        
                         with VideoFileClip(input_video_path) as video:
-                            new = video.subclip(prevTime, sec)
+                            new = video.subclip(round(float(prevTime),2), round(float(sec),2))
                             new.write_videofile(output_video_path, codec="libx264")
-                        #ffmpeg_extract_subclip("C:/P6/Project-6-Pose-Estimation/dataset/" + str(i) + ".wmv", float(prevTime), float(sec), targetname="C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(lolleren) + ".avi")
-                        print("found an exercise ", sec, frame)
-                        lolleren+=1
+                        print("found an exercise ", sec, frame, prevTime)
+                        totalAmountFound+=1
                         prevTime = sec
-                        stiger = 0
-                        falder = 0
+                        hasBeenUp = False
+                        cv2.imshow("Image", img)
+                        cv2.waitKey(100)
+                        
 
-                    if prevAngle != None and prevAngle > arm_angle:
-                        falder+=1
-                        if(falder > 5):
-                            stiger = 0
-
-                    if prevAngle != None and prevAngle < arm_angle:
-                        stiger+=1
-                        falder = 0
+                    if arm_angle < 60:
+                        hasBeenUp = True
                        
-                    prevAngle = arm_angle
-
                 elif exerice == 'armraise':
-                    arm_angle_list.append(calc.angle(
-                        p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
+                    arm_angle = calc.angle(p[HIP_LEFT], p[SHOULDER_LEFT], p[WRIST_LEFT])
+                    arm_angle_list.append(arm_angle)
                     shoulder_angle_list.append(calc.angle(
                         p[ELBOW_LEFT], p[SHOULDER_LEFT], p[HIP_LEFT]))
                     back_deviation_list.append(calc.devation(
                         p[SHOULDER_LEFT], p[HIP_LEFT]))
+                    if hasBeenUp and arm_angle < 10:
+                        sec = frame / 24
+                        input_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/" + str(i) + ".wmv"
+                        output_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(totalAmountFound) + ".mp4"
+                        with VideoFileClip(input_video_path) as video:
+                            new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                            new.write_videofile(output_video_path, codec="libx264")
+                        print("found an exercise ", sec, frame, prevTime)
+                        totalAmountFound+=1
+                        prevTime = sec
+                        hasBeenUp = False
+                        cv2.imshow("Image", img)
+                        cv2.waitKey(100)
+                    if arm_angle > 80:
+                        hasBeenUp = True
+
 
                 elif exerice == 'pushup':
+                    shoulder_angle = calc.angle(
+                       p[SHOULDER_LEFT],  p[ELBOW_LEFT], p[WRIST_LEFT])
                     arm_angle_list.append(calc.angle(
                         p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
-                    shoulder_angle_list.append(calc.angle(
-                        p[ELBOW_LEFT], p[SHOULDER_LEFT], p[HIP_LEFT]))
+                    shoulder_angle_list.append(shoulder_angle)
                     back_angle_list.append(calc.angle(
                         p[ANKLE_LEFT], p[HIP_LEFT], p[SHOULDER_LEFT]))
+                    if hasBeenUp and shoulder_angle > 145:
+                        sec = frame / 24
+                        input_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/" + str(i) + ".wmv"
+                        output_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(totalAmountFound) + ".mp4"
+                        with VideoFileClip(input_video_path) as video:
+                            new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                            new.write_videofile(output_video_path, codec="libx264")
+                        print("found an exercise ", sec, frame, prevTime)
+                        totalAmountFound+=1
+                        prevTime = sec
+                        hasBeenUp = False
+                        cv2.imshow("Image", img)
+                        cv2.waitKey(100)
+                    if shoulder_angle < 80:
+                        hasBeenUp = True
 
         except Exception as e:
             print(e)

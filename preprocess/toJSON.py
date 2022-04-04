@@ -1,5 +1,5 @@
 import json
-PATH = "dataset/labels.json"
+PATH = "C:/P6/Project-6-Pose-Estimation/dataset/labels.json"
 
 
 def labels_lenght():
