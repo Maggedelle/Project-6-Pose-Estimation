@@ -1,6 +1,6 @@
 import json
-PATH = "preprocess/labels.json"
 
+PATH = "C:/P6/Project-6-Pose-Estimation/dataset/labels.json"
 
 def labels_lenght():
     with open(PATH, "r+") as file:
