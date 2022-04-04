@@ -1,3 +1,4 @@
+from sklearn.preprocessing import StandardScaler
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -7,14 +8,13 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense
 
-from sklearn.preprocessing import StandardScaler
-
-
-dataset = pd.read_json('dataset/labels.json')
-x = dataset.iloc[:, :].values
-y = dataset.iloc[:, [1]].values
-print(pd.DataFrame(x))
-print(pd.DataFrame(y))
+dataset = pd.read_json("dataset/labels.json")
+x = dataset.iloc[:, :6].values
+y = dataset.iloc[:, 1:2].values
+print(dataset.info())
+display(dataset)
+# display(pd.DataFrame(x))
+# display(pd.DataFrame(y))
 #sc = StandardScaler()
 
 # Neural network

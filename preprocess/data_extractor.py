@@ -2,8 +2,9 @@ import cv2
 import mediapipe as mp
 import calculator as calc
 import toJSON
+import json
+import os
 
-LABELS_LENGHT = toJSON.labels_lenght()
 WRIST_LEFT = 15
 WRIST_RIGHT = 16
 ELBOW_LEFT = 13
@@ -28,66 +29,84 @@ def list_coordinates(img, landmarks):
     return poselist
 
 
+def find_correctness(correctness):
+    if correctness == 'correct':
+        return True
+    else:
+        return False
+
+
 mppose = mp.solutions.pose
 pose = mppose.Pose()
-arm_angle_list, back_deviation_list, shoulder_angle_list, back_angle_list = [], [], [], []
+correct_counter = 0
+arm_angle_list, back_deviation_list, shoulder_angle_list, hip_angle_list, leg_angle_list = [], [], [], [], []
 master_list = [arm_angle_list, back_deviation_list,
-               shoulder_angle_list, back_angle_list]
+               shoulder_angle_list, hip_angle_list, leg_angle_list]
+data = []
+x = 0
+folder = os.listdir('dataset')
 
-for i in range(LABELS_LENGHT):
-    exerice = toJSON.find_exercise(i)
-    cap = cv2.VideoCapture(f'dataset/{i}.wmv')
-    while True:
-        success, img = cap.read()
-        try:
-            imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            result = pose.process(imgRGB)
+with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
+    for exercise_folder in folder:
+        correct_folder = os.listdir("dataset/"+exercise_folder)
+        for correctness in correct_folder:
+            anden = os.listdir(
+                "dataset/" + exercise_folder + "/" + correctness)
+            for i in range(len(anden)):
+                cap = cv2.VideoCapture(
+                    f'dataset/{exercise_folder}/{correctness}/{i}.mp4')
+                while True:
+                    success, img = cap.read()
+                    try:
+                        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                        result = pose.process(imgRGB)
 
-            if result.pose_landmarks:
-                p = list_coordinates(img, result.pose_landmarks.landmark)
+                        if result.pose_landmarks:
+                            p = list_coordinates(
+                                img, result.pose_landmarks.landmark)
 
-                if exerice == 'armcurl':
-                    arm_angle_list.append(calc.angle(
-                        p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
-                    back_deviation_list.append(calc.devation(
-                        p[SHOULDER_LEFT], p[HIP_LEFT]))
+                            if exercise_folder == 'armcurl':
+                                arm_angle_list.append(calc.angle(
+                                    p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
+                                back_deviation_list.append(calc.devation(
+                                    p[SHOULDER_LEFT], p[HIP_LEFT]))
 
-                elif exerice == 'armraise':
-                    arm_angle_list.append(calc.angle(
-                        p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
-                    shoulder_angle_list.append(calc.angle(
-                        p[ELBOW_LEFT], p[SHOULDER_LEFT], p[HIP_LEFT]))
-                    back_deviation_list.append(calc.devation(
-                        p[SHOULDER_LEFT], p[HIP_LEFT]))
+                            elif exercise_folder == 'armraise':
+                                arm_angle_list.append(calc.angle(
+                                    p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
+                                shoulder_angle_list.append(calc.angle(
+                                    p[HIP_LEFT], p[SHOULDER_LEFT], p[WRIST_LEFT]))
+                                back_deviation_list.append(calc.devation(
+                                    p[SHOULDER_LEFT], p[HIP_LEFT]))
 
-                elif exerice == 'pushup':
-                    arm_angle_list.append(calc.angle(
-                        p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
-                    shoulder_angle_list.append(calc.angle(
-                        p[ELBOW_LEFT], p[SHOULDER_LEFT], p[HIP_LEFT]))
-                    back_angle_list.append(calc.angle(
-                        p[ANKLE_LEFT], p[HIP_LEFT], p[SHOULDER_LEFT]))
+                            elif exercise_folder == 'pushup':
+                                arm_angle_list.append(calc.angle(
+                                    p[WRIST_LEFT], p[ELBOW_LEFT], p[SHOULDER_LEFT]))
+                                leg_angle_list.append(calc.angle(
+                                    p[ANKLE_LEFT], p[KNEE_LEFT], p[HIP_LEFT]))
+                                hip_angle_list.append(calc.angle(
+                                    p[KNEE_LEFT], p[HIP_LEFT], p[SHOULDER_LEFT]))
 
-        except Exception as e:
-            # print(e)
-            if exerice == 'armcurl':
-                toJSON.add_data(arm_angle_list, i, 'arm_angle')
-                toJSON.add_data(back_deviation_list, i, 'upperback_deviation')
+                    except Exception as e:
+                        # print(e)
+                        if exercise_folder == 'armcurl':
+                            data.append(
+                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_1': sum(arm_angle_list.copy()), 'feature_2': sum(back_deviation_list.copy()), 'feature_3': 0, "feature_4": 0, "feature_5": 0})
 
-            elif exerice == 'armraise':
-                toJSON.add_data(arm_angle_list, i, 'arm_angle')
-                toJSON.add_data(shoulder_angle_list, i, 'shoulder_angle')
-                toJSON.add_data(back_deviation_list, i, 'upperback_deviation')
+                        elif exercise_folder == 'armraise':
+                            data.append(
+                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_1': sum(arm_angle_list.copy()), 'feature_2': sum(back_deviation_list.copy()), 'feature_3': sum(shoulder_angle_list.copy()), "feature_4": 0, "feature_5": 0})
 
-            elif exerice == 'pushup':
-                toJSON.add_data(arm_angle_list, i, 'arm_angle')
-                toJSON.add_data(shoulder_angle_list, i, 'shoulder_angle')
-                toJSON.add_data(back_angle_list, i, 'upperback_angle')
+                        elif exercise_folder == 'pushup':
+                            data.append(
+                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_1': sum(arm_angle_list.copy()), 'feature_2': 0, 'feature_3': 0, 'feature_4': sum(leg_angle_list.copy()), 'feature_5': sum(hip_angle_list.copy())})
 
-            for lists in master_list:
-                lists.clear()
+                        for lists in master_list:
+                            lists.clear()
 
-            print(f"Processing [{i+1}/{LABELS_LENGHT}]")
-            if i+1 == LABELS_LENGHT:
-                print("Done! :)")
-            break
+                        print(f"Processing [{x}]")
+                        if i+1 == len(correct_folder):
+                            print("Done!: )")
+                        break
+                x += 1
+    json.dump(data, f, ensure_ascii=False, indent=4)
