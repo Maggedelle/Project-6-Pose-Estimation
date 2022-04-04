@@ -21,4 +21,3 @@ class FCLayer(Layer):
         self.bias -= learning_rate * output_error
 
         return input_error
-
