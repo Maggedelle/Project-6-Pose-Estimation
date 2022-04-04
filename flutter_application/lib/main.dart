@@ -6,7 +6,6 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:native_opencv/native_opencv.dart';
 import 'package:flutter_application/camera.dart';
 import 'package:flutter_application/cameraPage/cameraPage.dart';
 import 'package:flutter_application/homeScreen/homeScreen.dart';
@@ -17,13 +16,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  NativeOpenCv nativeOpenCv = NativeOpenCv();
 
   // Obtain a list of the available cameras on the device.
   final cameras = await availableCameras();
 
   final channel = WebSocketChannel.connect(
-    Uri.parse('ws://172.25.20.235:5000/ws'),
+    Uri.parse('ws://192.168.87.181:5000/ws'),
   );
 
   channel.stream.listen(

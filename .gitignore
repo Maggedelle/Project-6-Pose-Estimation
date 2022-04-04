@@ -443,3 +443,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Video files
+*.wmv
+*.mp4
