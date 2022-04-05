@@ -91,22 +91,20 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                         # print(e)
                         if exercise_folder == 'armcurl':
                             data.append(
-                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_1': sum(arm_angle_list.copy()), 'feature_2': sum(back_deviation_list.copy()), 'feature_3': 0, "feature_4": 0, "feature_5": 0})
+                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_armcurl': 1, 'feature_armraise': 0, 'feature_pushup': 0, 'feature_1': sum(arm_angle_list.copy()), 'feature_2': sum(back_deviation_list.copy()), 'feature_3': 0, "feature_4": 0, "feature_5": 0})
 
                         elif exercise_folder == 'armraise':
                             data.append(
-                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_1': sum(arm_angle_list.copy()), 'feature_2': sum(back_deviation_list.copy()), 'feature_3': sum(shoulder_angle_list.copy()), "feature_4": 0, "feature_5": 0})
+                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_armcurl': 0, 'feature_armraise': 1, 'feature_pushup': 0, 'feature_1': sum(arm_angle_list.copy()), 'feature_2': sum(back_deviation_list.copy()), 'feature_3': sum(shoulder_angle_list.copy()), "feature_4": 0, "feature_5": 0})
 
                         elif exercise_folder == 'pushup':
                             data.append(
-                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_1': sum(arm_angle_list.copy()), 'feature_2': 0, 'feature_3': 0, 'feature_4': sum(leg_angle_list.copy()), 'feature_5': sum(hip_angle_list.copy())})
+                                {'id': x, 'exercise': exercise_folder, 'correct': find_correctness(correctness), 'feature_armcurl': 0, 'feature_armraise': 0, 'feature_pushup': 1, 'feature_1': sum(arm_angle_list.copy()), 'feature_2': 0, 'feature_3': 0, 'feature_4': sum(leg_angle_list.copy()), 'feature_5': sum(hip_angle_list.copy())})
 
                         for lists in master_list:
                             lists.clear()
 
                         print(f"Processing [{x}]")
-                        if i+1 == len(correct_folder):
-                            print("Done!: )")
                         break
                 x += 1
-    json.dump(data, f, ensure_ascii=False, indent=4)
+    json.dump(data, f)

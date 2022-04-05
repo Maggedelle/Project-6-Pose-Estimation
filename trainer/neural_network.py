@@ -8,7 +8,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense
 
-dataset = pd.read_json("dataset/labels.json")
+dataset = pd.read_json("preprocess/labels.json")
 x = dataset.iloc[:, :6].values
 y = dataset.iloc[:, 1:2].values
 print(dataset.info())
