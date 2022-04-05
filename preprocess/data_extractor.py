@@ -31,9 +31,9 @@ def list_coordinates(img, landmarks):
 
 def find_correctness(correctness):
     if correctness == 'correct':
-        return True
+        return 1
     else:
-        return False
+        return 0
 
 
 mppose = mp.solutions.pose
