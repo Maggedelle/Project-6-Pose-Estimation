@@ -13,8 +13,8 @@ class FCLayer(Layer):
         return self.output
 
     def backward_propagation(self, output_error, learning_rate):
-        input_error = np.dot(output_error, self.weights.T)
-        weights_error = np.dot(self.input.T, output_error)
+        input_error = np.dot(output_error, self.weights)
+        weights_error = np.dot(self.input, output_error)
 
         # Update parametrene i layeret
         self.weights -= learning_rate * weights_error
