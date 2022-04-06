@@ -16,6 +16,7 @@ KNEE_RIGHT = 26
 ANKLE_LEFT = 27
 ANKLE_RIGHT = 28
 
+
 def calc_angle(p1, p2, p3):
     vector_ab = p1[1] - p2[1], p1[2] - p2[2]
     vector_bc = p3[1] - p2[1], p3[2] - p2[2]
@@ -50,7 +51,7 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-cap = cv2.VideoCapture('dataset/14.wmv')
+cap = cv2.VideoCapture('dataset/pushup/incorrect/0.mp4')
 #cap = cv2.VideoCapture(0)
 time_b = 0
 while True:
@@ -64,14 +65,14 @@ while True:
         plist = list_coordinates(img, result.pose_landmarks.landmark)
 
         cv2.putText(img, str(int(calc_angle(
-                       plist[SHOULDER_LEFT],  plist[ELBOW_LEFT], plist[WRIST_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
-                    cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
+            plist[KNEE_LEFT], plist[HIP_LEFT], plist[SHOULDER_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
+            cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
       #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
        #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
        # cv2.putText(img, str(int(calc_angle(plist[24], plist[12], plist[14]))), (plist[12][1] - 50, plist[12][2] + 30),
         #            cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-        #cv2.putText(img, str(int(calc_angle(plist[13], plist[11], plist[23]))), (plist[11][1] - 50, plist[11][2] + 30),
-         #           cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
+        # cv2.putText(img, str(int(calc_angle(plist[13], plist[11], plist[23]))), (plist[11][1] - 50, plist[11][2] + 30),
+        #           cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
 
         print(calc_angle(plist[24], plist[26], plist[28]))
         print(plist)
@@ -83,4 +84,4 @@ while True:
     cv2.putText(img, "fps: " + str(int(fps)), (70, 50),
                 cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 0), 3)
     cv2.imshow("Image", img)
-    cv2.waitKey(100)
+    cv2.waitKey(400)

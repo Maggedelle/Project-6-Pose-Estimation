@@ -89,6 +89,6 @@ with open('preprocess/labels.json', 'r+') as f:
 
 
 with open('preprocess/labels.json', 'w') as f:
-    json.dump(data, f, indent=4)
+    json.dump(data, f)
 
 print("done")
