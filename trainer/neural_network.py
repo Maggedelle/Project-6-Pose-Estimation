@@ -56,9 +56,20 @@ net.add(Activation_Layer(tanh, tanh_prime))
 
 
 net.use(mse, mse_prime)
-net.fit(x_train, y_train, epochs=1000, learning_rate=0.1)
+net.fit(x_train, y_train, epochs=15000, learning_rate=0.025)
 
 out = net.predict(x_test)
 
 for i in range(len(out)):
     print("prediction: ", out[i], ", actual value: ", y_test[i])
+
+count = 0
+for i in range(len(out)):
+
+    if(out[i] >= 0.9 and y_test[i] == 1):
+        count += 1
+    elif(out[i] < 0.1 and y_test[i] == 0):
+        count += 1
+    print("prediction: ", out[i], ", actual value: ", y_test[i])
+
+print((count * 100) / len(out), "%")
