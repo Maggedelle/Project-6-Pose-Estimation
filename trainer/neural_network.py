@@ -19,10 +19,15 @@ x_train = x_train.astype('float32')
 x_test = x_test.reshape(x_test.shape[0], 1, 1*8)
 x_test = x_test.astype('float32')
 
+
 net = Network()
 net.add(FCLayer(8, 5))
+
 net.add(Activation_Layer(tanh, tanh_prime))
-net.add(FCLayer(5, 1))
+net.add(FCLayer(5, 3))
+net.add(Activation_Layer(tanh, tanh_prime))
+net.add(FCLayer(3, 1))
+
 net.add(Activation_Layer(tanh, tanh_prime))
 
 
