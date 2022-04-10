@@ -84,8 +84,10 @@ class ExerciseCard extends StatelessWidget {
         Navigator.pushNamed(context, "/cameraScreen/armcurl");
       },
       style: ButtonStyle(
-            shadowColor: MaterialStateProperty.all(Colors.white.withOpacity(0)),
-           backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0)),
+           shadowColor: MaterialStateProperty.all(Colors.transparent),
+           backgroundColor: MaterialStateProperty.all(Colors.transparent),
+           elevation: MaterialStateProperty.all(0)
+           
       ),
       child: Container(
 
