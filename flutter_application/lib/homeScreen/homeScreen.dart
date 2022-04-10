@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/constants.dart';
+
+import '../components/body.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -6,49 +9,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home Screen"),
-      ),
-      body: Center(
-        child: Column(children: [
-          const Padding(padding: EdgeInsets.all(10.0)),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/cameraScreen');
-            },
-            child: const Text("Bicep Curls"),
-            style: ElevatedButton.styleFrom(
-                fixedSize: const Size(400, 200),
-                primary: const Color.fromARGB(181, 53, 240, 6),
-                onPrimary: const Color.fromARGB(235, 231, 17, 17),
-                textStyle: const TextStyle(fontSize: 60)),
-          ),
-          const Padding(padding: EdgeInsets.all(10.0)),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/cameraScreen');
-            },
-            child: const Text("Arm Raises"),
-            style: ElevatedButton.styleFrom(
-                fixedSize: const Size(400, 200),
-                primary: const Color.fromARGB(181, 53, 240, 6),
-                onPrimary: const Color.fromARGB(235, 231, 17, 17),
-                textStyle: const TextStyle(fontSize: 60)),
-          ),
-          const Padding(padding: EdgeInsets.all(10.0)),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/cameraScreen');
-            },
-            child: const Text("Push Ups"),
-            style: ElevatedButton.styleFrom(
-                fixedSize: const Size(400, 200),
-                primary: const Color.fromARGB(181, 53, 240, 6),
-                onPrimary: const Color.fromARGB(235, 231, 17, 17),
-                textStyle: const TextStyle(fontSize: 60)),
-          ),
-        ]),
-      ),
+      backgroundColor: kPrimaryColor,
+      appBar: buildAppBar(),
+      body: Body(),
+    );
+  }
+  AppBar buildAppBar (){
+    return AppBar(
+      elevation: 0,
+        backgroundColor: kPrimaryColor,
+        title: const Text("Your Online Fitness Coach"),
     );
   }
 }

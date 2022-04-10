@@ -8,10 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/camera.dart';
 import 'package:flutter_application/cameraPage/cameraPage.dart';
+import 'package:flutter_application/constants.dart';
 import 'package:flutter_application/homeScreen/homeScreen.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:math';
-
+import 'package:google_fonts/google_fonts.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations(
@@ -40,15 +41,27 @@ void main() async {
   var data = {'type': 'init', 'id': id};
   channel.sink.add(json.encode(data));
 
+
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
+  
+  final ThemeData theme = ThemeData();
   runApp(MaterialApp(
     title: "Exercise Correction - Pose Estimateion",
+    theme: theme.copyWith(
+      primaryColor: kPrimaryColor,
+      colorScheme: theme.colorScheme.copyWith(secondary: kPrimaryColor, primary: kPrimaryColor),
+      visualDensity: VisualDensity.adaptivePlatformDensity
+    ),
     initialRoute: '/',
     routes: {
       '/': (context) => const HomeScreen(),
-      '/cameraScreen': (context) =>
-          CameraScreen(camera: firstCamera, channel: channel, id: id)
+      '/cameraScreen/armcurl': (context) =>
+          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType:"armcurl"),
+      '/cameraScreen/armraise': (context) =>
+          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "armraise"),
+      '/cameraScreen/pushup': (context) =>
+          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "pushup")
     },
   ));
 }
