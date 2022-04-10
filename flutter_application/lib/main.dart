@@ -55,7 +55,7 @@ void main() async {
     ),
     initialRoute: '/',
     routes: {
-      '/': (context) => const HomeScreen(),
+      '/': (context) =>  HomeScreen(),
       '/cameraScreen/armcurl': (context) =>
           CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType:"armcurl"),
       '/cameraScreen/armraise': (context) =>

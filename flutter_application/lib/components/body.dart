@@ -4,29 +4,39 @@ import 'package:flutter_application/model/exercises.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Body extends StatefulWidget {
+  const Body({Key? key, required this.onChanged}) : super(key: key);
+  final ValueChanged onChanged;
   @override
   State<Body> createState() => _BodyState();
 }
 
 class _BodyState extends State<Body> {
-
   List<Exercise> showingExercises = Exercises;
   String selectedCategory = "All";
   String searchQuery = "";
   void updateShowingExercise() {
     List<Exercise> exercises = Exercises;
-    
-    if(selectedCategory != "All") {
-      exercises = exercises.where((element) => element.category == selectedCategory).toList();
+
+    if (selectedCategory != "All") {
+      exercises = exercises
+          .where((element) => element.category == selectedCategory)
+          .toList();
     }
 
-    if(searchQuery != "") {
-      exercises = exercises.where((element) => element.title.toLowerCase().contains(searchQuery)).toList();
+    if (searchQuery != "") {
+      exercises = exercises
+          .where((element) => element.title.toLowerCase().contains(searchQuery))
+          .toList();
     }
 
-  setState(() {
-    showingExercises = exercises;
-  });
+    setState(() {
+      showingExercises = exercises;
+    });
+  }
+
+  void onCardClick(Exercise exercise) {
+
+    widget.onChanged(exercise);
   }
 
   @override
@@ -39,10 +49,12 @@ class _BodyState extends State<Body> {
             updateShowingExercise();
           },
         ),
-        CategoryList(onChanged: (value) { 
-          selectedCategory = value;
-          updateShowingExercise();
-        },),
+        CategoryList(
+          onChanged: (value) {
+            selectedCategory = value;
+            updateShowingExercise();
+          },
+        ),
         SizedBox(height: kDefaultPadding / 2),
         Expanded(
           child: Stack(
@@ -50,14 +62,20 @@ class _BodyState extends State<Body> {
               Container(
                 margin: EdgeInsets.only(top: 70),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(181,230,29, 1),
+                    color: Color.fromRGBO(181, 230, 29, 1),
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(40),
                         topRight: Radius.circular(40))),
               ),
               ListView.builder(
-                itemCount:  showingExercises.length,
-                itemBuilder: (context,index) => ExerciseCard(exercise:showingExercises[index], exerciseIndex: index,),
+                itemCount: showingExercises.length,
+                itemBuilder: (context, index) => ExerciseCard(
+                  exercise: showingExercises[index],
+                  exerciseIndex: index,
+                  onChanged: (value) {
+                    onCardClick(value);
+                  },
+                ),
               ),
             ],
           ),
@@ -68,73 +86,74 @@ class _BodyState extends State<Body> {
 }
 
 class ExerciseCard extends StatelessWidget {
-  const ExerciseCard({
-    Key? key,
-    required this.exerciseIndex,
-    required this.exercise
-  }) : super(key: key);
+  const ExerciseCard(
+      {Key? key,
+      required this.exerciseIndex,
+      required this.exercise,
+      required this.onChanged})
+      : super(key: key);
 
+  final ValueChanged onChanged;
   final int exerciseIndex;
   final Exercise exercise;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return ElevatedButton(
-      onPressed: () {
-        Navigator.pushNamed(context, "/cameraScreen/armcurl");
-      },
-      style: ButtonStyle(
-           shadowColor: MaterialStateProperty.all(Colors.transparent),
-           backgroundColor: MaterialStateProperty.all(Colors.transparent),
-           elevation: MaterialStateProperty.all(0)
-           
-      ),
-      child: Container(
-
-      margin: EdgeInsets.symmetric(
-        horizontal: kDefaultPadding,
-        vertical: kDefaultPadding / 2,
-      ),
-      height: 160,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-
-          Container(
-            height: 136,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              color: kBlueColor,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(22)),
-            ),
+        onPressed: () {
+          //Navigator.pushNamed(context, "/cameraScreen/armcurl");
+          onChanged(exercise);
+        },
+        style: ButtonStyle(
+            shadowColor: MaterialStateProperty.all(Colors.transparent),
+            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+            elevation: MaterialStateProperty.all(0)),
+        child: Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: kDefaultPadding,
+            vertical: kDefaultPadding / 2,
           ),
-          Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
-                height: 160,
-                width: 200,
-                child:
-                    Image.asset(exercise.image, fit: BoxFit.cover),
-              )),
-          Positioned(
-            bottom: 0,
-            left:0,
-              child: SizedBox(
-            height: 90,
-            width: size.width - 250,
-            child: Column(
-              children: <Widget>[Text(exercise.title, style: Theme.of(context).textTheme.headline5)],
-            ),
-          ))
-        ],
-      ),
-      )
-    );
+          height: 160,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: <Widget>[
+              Container(
+                height: 136,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  color: kBlueColor,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22)),
+                ),
+              ),
+              Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                    height: 160,
+                    width: 200,
+                    child: Image.asset(exercise.image, fit: BoxFit.cover),
+                  )),
+              Positioned(
+                  bottom: 0,
+                  left: 0,
+                  child: SizedBox(
+                    height: 90,
+                    width: size.width - 250,
+                    child: Column(
+                      children: <Widget>[
+                        Text(exercise.title,
+                            style: Theme.of(context).textTheme.headline5)
+                      ],
+                    ),
+                  ))
+            ],
+          ),
+        ));
   }
 }
 
