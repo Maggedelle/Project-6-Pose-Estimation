@@ -51,7 +51,7 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-cap = cv2.VideoCapture('dataset/pushup/incorrect/0.mp4')
+cap = cv2.VideoCapture('dataset/armcurl/correct/6.mp4')
 #cap = cv2.VideoCapture(0)
 time_b = 0
 while True:
@@ -65,7 +65,7 @@ while True:
         plist = list_coordinates(img, result.pose_landmarks.landmark)
 
         cv2.putText(img, str(int(calc_angle(
-            plist[KNEE_LEFT], plist[HIP_LEFT], plist[SHOULDER_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
+            plist[ELBOW_LEFT], plist[SHOULDER_LEFT], plist[HIP_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
       #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
        #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))

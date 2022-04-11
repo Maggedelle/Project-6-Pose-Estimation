@@ -34,8 +34,9 @@ class Network:
         samples = len(x_train)
 
         # trænings loop
-        for i in range(epochs):
-            err = 0
+        err = 1
+        i = 0
+        while err > 0.0025 and i < epochs:
 
             for j in range(samples):
                 output = x_train[j]
@@ -51,4 +52,5 @@ class Network:
                     error = layer.backward_propagation(error, learning_rate)
 
             err /= samples
-            print('epoch %d/%d  error = %f' % (i+1, epochs, err))
+            i = i + 1
+            print('epoch %d/%d  error = %f' % (i, epochs, err))
