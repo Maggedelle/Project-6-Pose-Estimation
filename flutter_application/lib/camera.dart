@@ -18,11 +18,13 @@ class CameraScreen extends StatefulWidget {
     required this.camera,
     required this.channel,
     required this.id,
+    required this.exerciseType
   }) : super(key: key);
 
   final CameraDescription camera;
   final WebSocketChannel channel;
   final String id;
+  final String exerciseType;
   @override
   CameraScreenState createState() => CameraScreenState();
 }
@@ -148,7 +150,7 @@ class CameraScreenState extends State<CameraScreen> {
   Future<void> sendBytes(String bytes) async {
     try {
       widget.channel.sink.add(
-          json.encode({"frame": bytes, "id": widget.id, "type": "sendImage"}));
+          json.encode({"frame": bytes, "id": widget.id, "type": "sendImage", "exerciseType": widget.exerciseType}));
     } catch (e) {
       print("ERROR: " + e.toString());
     }

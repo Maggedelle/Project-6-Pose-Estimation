@@ -1,54 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/components/exercisePage.dart';
+import 'package:flutter_application/constants.dart';
+import 'package:flutter_application/model/exercises.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+import '../components/body.dart';
+
+class HomeScreen extends StatefulWidget {
+  HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Exercise? showingExercise = null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home Screen"),
-      ),
-      body: Center(
-        child: Column(children: [
-          const Padding(padding: EdgeInsets.all(10.0)),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/cameraScreen');
-            },
-            child: const Text("Bicep Curls"),
-            style: ElevatedButton.styleFrom(
-                fixedSize: const Size(400, 200),
-                primary: const Color.fromARGB(181, 53, 240, 6),
-                onPrimary: const Color.fromARGB(235, 231, 17, 17),
-                textStyle: const TextStyle(fontSize: 60)),
-          ),
-          const Padding(padding: EdgeInsets.all(10.0)),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/cameraScreen');
-            },
-            child: const Text("Arm Raises"),
-            style: ElevatedButton.styleFrom(
-                fixedSize: const Size(400, 200),
-                primary: const Color.fromARGB(181, 53, 240, 6),
-                onPrimary: const Color.fromARGB(235, 231, 17, 17),
-                textStyle: const TextStyle(fontSize: 60)),
-          ),
-          const Padding(padding: EdgeInsets.all(10.0)),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/cameraScreen');
-            },
-            child: const Text("Push Ups"),
-            style: ElevatedButton.styleFrom(
-                fixedSize: const Size(400, 200),
-                primary: const Color.fromARGB(181, 53, 240, 6),
-                onPrimary: const Color.fromARGB(235, 231, 17, 17),
-                textStyle: const TextStyle(fontSize: 60)),
-          ),
-        ]),
-      ),
+      backgroundColor: kPrimaryColor,
+      appBar: buildAppBar(),
+      body: showingExercise == null ? Body(onChanged: (value) {  
+          setState(() {
+            showingExercise = value;
+          });
+      },) : ExercisePage(exercise: showingExercise!, onChanged: (value) {
+        setState(() {
+          showingExercise = null;
+        });
+      }),
+    );
+  }
+
+  AppBar buildAppBar (){
+    return AppBar(
+      elevation: 0,
+        backgroundColor: kPrimaryColor,
+        title: const Text("Your Online Fitness Coach"),
     );
   }
 }

@@ -1,11 +1,9 @@
 import asyncio
-import sched,time
 from fastapi import FastAPI, WebSocket
 import uvicorn
 import poseEstimation
-import json
-import threading
 import mediapipe as mp
+import calculator as calc
 
 app = FastAPI(title='ESMA API')
 mpPose = mp.solutions.pose
