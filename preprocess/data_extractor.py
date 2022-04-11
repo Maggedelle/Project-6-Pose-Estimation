@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import calculator as calc
+import normalization
 import json
 import os
 
@@ -46,12 +47,13 @@ data = []
 id_ = 0
 folder = os.listdir('dataset')
 
-
 with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
     for exercise_folder in folder:
         correct_folder = os.listdir(f'dataset/{exercise_folder}')
+
         for correctness in correct_folder:
             clips = os.listdir(f'dataset/{exercise_folder}/{correctness}')
+
             for i in range(len(clips)):
                 cap = cv2.VideoCapture(
                     f'dataset/{exercise_folder}/{correctness}/{i}.mp4')
@@ -107,7 +109,6 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                                     'feature_4': 0,
                                     'feature_5': 0
                                  })
-
                         elif exercise_folder == 'armraise':
                             data.append(
                                 {'id': id_,
@@ -122,7 +123,6 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                                     'feature_4': 0,
                                     'feature_5': 0
                                  })
-
                         elif exercise_folder == 'pushup':
                             data.append(
                                 {'id': id_,
@@ -145,4 +145,5 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                         break
                 id_ += 1
     json.dump(data, f)
-    data.clear()
+print("Data extracted ✔️")
+normalization.normalizer()
