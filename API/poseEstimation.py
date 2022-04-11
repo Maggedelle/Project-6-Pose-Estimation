@@ -3,19 +3,42 @@ import numpy as np
 import cv2 as cv
 import base64
 import mediapipe as mp
+import calculator as calc
 
-fps = 100 #amount of miliseconds to wait, before showing next image
+WRIST_LEFT = 15
+WRIST_RIGHT = 16
+ELBOW_LEFT = 13
+ELBOW_RIGHT = 14
+SHOULDER_LEFT = 11
+SHOULDER_RIGHT = 12
+HIP_LEFT = 23
+HIP_RIGHT = 24
+KNEE_LEFT = 25
+KNEE_RIGHT = 26
+ANKLE_LEFT = 27
+ANKLE_RIGHT = 28
+
+
+def list_coordinates(img, landmarks):
+    poselist = []
+    for index, landmark in enumerate(landmarks):
+        height, width, not_used = img.shape
+        x, y = int(width * landmark.x), int(height * landmark.y)
+        poselist.append([index, x, y])
+
+    return poselist
+
+fps = 42 #amount of miliseconds to wait, before showing next image
 
 mpDraw = mp.solutions.drawing_utils
 mpPose = mp.solutions.pose
-
-
     
 async def receivedFrameData(connections):
     for connection in connections:
         if(connection.currFrame != None):
             img = await decodeBase64(connection.currFrame)
             poseResults = await findPose(img, connection.pose)
+            await calculateAngles(poseResults, connection.currExercise, img)
             await showFrame(img, fps,connection.id,poseResults)
 
 async def showFrame(frame:np.mat, fps:int, connectionId:str, poseResults = None):
@@ -28,6 +51,26 @@ async def findPose(frame:np.mat, pose):
     results = pose.process(frame)
     return results
 
+async def calculateAngles(poseResults, exercise, frame):
+    if(poseResults.pose_landmarks != None):
+        coordinates = list_coordinates(frame,poseResults.pose_landmarks.landmark)
+        if(exercise == "armcurl"):
+            if(coordinates[WRIST_LEFT] != None and coordinates[ELBOW_LEFT] != None and coordinates[SHOULDER_LEFT] != None):
+                arm_angle = calc.angle(coordinates[WRIST_LEFT], coordinates[ELBOW_LEFT], coordinates[SHOULDER_LEFT])
+                back_deviation_ = calc.devation(coordinates[SHOULDER_LEFT], coordinates[HIP_LEFT])
+        elif(exercise == "armraise"):
+            if(coordinates[WRIST_LEFT] != None and coordinates[ELBOW_LEFT] != None and coordinates[SHOULDER_LEFT] != None
+            and coordinates[HIP_LEFT] != None):
+                arm_angle = calc.angle(coordinates[WRIST_LEFT], coordinates[ELBOW_LEFT], coordinates[SHOULDER_LEFT])
+                shoulder_angle = calc.angle(coordinates[HIP_LEFT], coordinates[SHOULDER_LEFT], coordinates[WRIST_LEFT])
+                back_deviation_angle = calc.devation(coordinates[SHOULDER_LEFT], coordinates[HIP_LEFT])
+        elif(exercise == "pushup"):
+            if(coordinates[WRIST_LEFT] != None and coordinates[SHOULDER_LEFT] != None and coordinates[ELBOW_LEFT] != None
+            and coordinates[KNEE_LEFT] != None and coordinates[HIP_LEFT] != None and coordinates[ANKLE_LEFT] != None):
+                arm_angle = calc.angle(coordinates[SHOULDER_LEFT], coordinates[ELBOW_LEFT], coordinates[WRIST_LEFT])
+                leg_angle = calc.angle(coordinates[ANKLE_LEFT, coordinates[KNEE_LEFT], coordinates[HIP_LEFT]])
+                hip_angle = calc.angle(coordinates[KNEE_LEFT], coordinates[HIP_LEFT], coordinates[SHOULDER_LEFT])
+                
 async def decodeBase64(bytes:str):
     im_bytes = base64.b64decode(bytes)
     im_arr = np.frombuffer(im_bytes, dtype=np.uint8)

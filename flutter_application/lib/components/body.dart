@@ -35,7 +35,6 @@ class _BodyState extends State<Body> {
   }
 
   void onCardClick(Exercise exercise) {
-
     widget.onChanged(exercise);
   }
 
