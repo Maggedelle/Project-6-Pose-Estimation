@@ -1,4 +1,5 @@
 import asyncio
+from collections import defaultdict
 from fastapi import FastAPI, WebSocket
 import uvicorn
 import poseEstimation
@@ -15,10 +16,14 @@ class connectionUser:
         self.currFrame = None
         self.pose = pose
         self.currExercise = None
+        self.prevAngles = defaultdict(int)
+        self.hasBeenUp = False
     id: str
     pose:any
     currFrame: str
     currExercise: str
+    prevAngles: dict()
+    hasBeenUp: bool
 
 connections = []
 
