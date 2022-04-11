@@ -54,12 +54,11 @@ net.add(Activation_Layer(tanh, tanh_prime))
 net.add(FCLayer(3, 1))
 net.add(Activation_Layer(tanh, tanh_prime))
 
-
 net.use(mse, mse_prime)
 net.fit(x_train, y_train, epochs=15000, learning_rate=0.025)
 
 out = net.predict(x_test)
-
+count = 0;
 for i in range(len(out)):
     print("prediction: ", out[i], ", actual value: ", y_test[i])
 
