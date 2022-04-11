@@ -47,9 +47,9 @@ id_ = 0
 folder = os.listdir('dataset')
 
 
-for exercise_folder in folder:
-    correct_folder = os.listdir(f'dataset/{exercise_folder}')
-    with open(f'preprocess/{exercise_folder}.json', 'w', encoding='utf-8') as f:
+with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
+    for exercise_folder in folder:
+        correct_folder = os.listdir(f'dataset/{exercise_folder}')
         for correctness in correct_folder:
             clips = os.listdir(f'dataset/{exercise_folder}/{correctness}')
             for i in range(len(clips)):
@@ -144,5 +144,5 @@ for exercise_folder in folder:
                         print(f'Processing [{id_}]')
                         break
                 id_ += 1
-        json.dump(data, f)
-        data.clear()
+    json.dump(data, f)
+    data.clear()
