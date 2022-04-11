@@ -90,7 +90,7 @@ class _ExercisePageState extends State<ExercisePage> {
             SizedBox(width: 100),
             ElevatedButton(
               onPressed: (() =>
-                  Navigator.pushNamed(context, "/cameraScreen/armcurl")),
+                  Navigator.pushNamed(context, "/cameraScreen/" + widget.exercise.type)),
               child: Text("Begin"),
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(

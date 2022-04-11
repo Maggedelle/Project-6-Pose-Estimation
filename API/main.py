@@ -14,9 +14,11 @@ class connectionUser:
         self.id = id
         self.currFrame = None
         self.pose = pose
+        self.currExercise = None
     id: str
     pose:any
     currFrame: str
+    currExercise: str
 
 connections = []
 
@@ -27,13 +29,13 @@ async def on_startup():
 async def updateFrames():
     while True:
         await poseEstimation.receivedFrameData(connections)
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.042)
 
 async def updateConnection (clientData):
     user = next(x for x in connections if x.id == clientData["id"])
     if(user):
-        user.currFrame = clientData["frame"];
-
+        user.currFrame = clientData["frame"]
+        user.currExercise = clientData["exerciseType"]
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
