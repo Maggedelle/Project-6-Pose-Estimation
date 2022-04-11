@@ -83,20 +83,19 @@ class _ExercisePageState extends State<ExercisePage> {
             ElevatedButton(
                 onPressed: (() => widget.onChanged("back")),
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      Color.fromRGBO(181, 230, 29, 1)),
-                      minimumSize: MaterialStateProperty.all(Size(125, 50))
-                ),
+                    backgroundColor: MaterialStateProperty.all(
+                        Color.fromRGBO(181, 230, 29, 1)),
+                    minimumSize: MaterialStateProperty.all(Size(125, 50))),
                 child: Text("Back")),
             SizedBox(width: 100),
             ElevatedButton(
-              onPressed: (() => Navigator.pushNamed(context, "/cameraScreen/armcurl")),
+              onPressed: (() =>
+                  Navigator.pushNamed(context, "/cameraScreen/armcurl")),
               child: Text("Begin"),
               style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(Color.fromRGBO(181, 230, 29, 1)),
-                    minimumSize: MaterialStateProperty.all(Size(125, 50))
-              ),
+                  backgroundColor: MaterialStateProperty.all(
+                      Color.fromRGBO(181, 230, 29, 1)),
+                  minimumSize: MaterialStateProperty.all(Size(125, 50))),
             )
           ],
         ),

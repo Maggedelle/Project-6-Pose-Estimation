@@ -20,23 +20,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: kPrimaryColor,
       appBar: buildAppBar(),
-      body: showingExercise == null ? Body(onChanged: (value) {  
-          setState(() {
-            showingExercise = value;
-          });
-      },) : ExercisePage(exercise: showingExercise!, onChanged: (value) {
-        setState(() {
-          showingExercise = null;
-        });
-      }),
+      body: showingExercise == null
+          ? Body(
+              onChanged: (value) {
+                setState(() {
+                  showingExercise = value;
+                });
+              },
+            )
+          : ExercisePage(
+              exercise: showingExercise!,
+              onChanged: (value) {
+                setState(() {
+                  showingExercise = null;
+                });
+              }),
     );
   }
 
-  AppBar buildAppBar (){
+  AppBar buildAppBar() {
     return AppBar(
       elevation: 0,
-        backgroundColor: kPrimaryColor,
-        title: const Text("Your Online Fitness Coach"),
+      backgroundColor: kPrimaryColor,
+      title: const Text("Your Online Fitness Coach"),
     );
   }
 }
