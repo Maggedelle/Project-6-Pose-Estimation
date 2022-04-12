@@ -5,17 +5,30 @@ from layers.fc_layer import FCLayer
 from layers.activation_layer import Activation_Layer
 from helper_functions.activation_functions import tanh, tanh_prime
 from helper_functions.loss_function import mse, mse_prime
+from helper_functions.save_weight import save, load
 from sklearn.model_selection import KFold
 
 dataset = pd.read_json("preprocess/labels.json")
 result, fold_iteration = list(), 0
 
+input_layer = FCLayer(8, 5)
+input_layer.weights = load('weights', 0)
+input_layer.bias = load('bias', 0)
+
+middel_layer = FCLayer(5, 3)
+middel_layer.weights = load('weights', 1)
+middel_layer.bias = load('bias', 1)
+
+output_layer = FCLayer(3, 1)
+output_layer.weights = load('weights', 2)
+output_layer.bias = load('bias', 2)
+
 net = Network()
-net.add(FCLayer(8, 5))
+net.add(input_layer)
 net.add(Activation_Layer(tanh, tanh_prime))
-net.add(FCLayer(5, 3))
+net.add(middel_layer)
 net.add(Activation_Layer(tanh, tanh_prime))
-net.add(FCLayer(3, 1))
+net.add(output_layer)
 net.add(Activation_Layer(tanh, tanh_prime))
 net.use(mse, mse_prime)
 
@@ -34,7 +47,8 @@ for train_index, test_index in kf5.split(range(len(dataset))):
     x_test = x_test.reshape(x_test.shape[0], 1, 1*8)
     x_test = x_test.astype('float32')
 
-    net.fit(x_train, y_train, epochs=5000, learning_rate=0.025)
+    net.fit(x_train, y_train, epochs=100,
+            learning_rate=0.025, save_weights=save)
     out = net.predict(x_test)
 
     count = 0
