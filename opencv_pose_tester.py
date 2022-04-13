@@ -51,8 +51,8 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-cap = cv2.VideoCapture('dataset/armcurl/correct/6.mp4')
-#cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture('dataset/armcurl/correct/6.mp4')
+cap = cv2.VideoCapture(0)
 time_b = 0
 while True:
     success, img = cap.read()
@@ -65,7 +65,7 @@ while True:
         plist = list_coordinates(img, result.pose_landmarks.landmark)
 
         cv2.putText(img, str(int(calc_angle(
-            plist[ELBOW_LEFT], plist[SHOULDER_LEFT], plist[HIP_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
+            plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
       #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
        #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
@@ -81,7 +81,7 @@ while True:
     fps = 1/(time_a-time_b)
     time_b = time_a
 
-    cv2.putText(img, "fps: " + str(int(fps)), (70, 50),
+    cv2.putText(img, "fps: " + str(cap.get(cv2.CAP_PROP_FPS)), (70, 50),
                 cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 0), 3)
     cv2.imshow("Image", img)
-    cv2.waitKey(400)
+    cv2.waitKey(42)

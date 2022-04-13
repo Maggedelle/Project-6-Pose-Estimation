@@ -5,6 +5,7 @@ import uvicorn
 import poseEstimation
 import mediapipe as mp
 import calculator as calc
+import datetime as dt
 
 app = FastAPI(title='ESMA API')
 mpPose = mp.solutions.pose
@@ -34,8 +35,7 @@ async def on_startup():
 async def updateFrames():
     while True:
         await poseEstimation.receivedFrameData(connections)
-        await asyncio.sleep(0.042)
-
+        await asyncio.sleep(0.041)
 async def updateConnection (clientData):
     user = next(x for x in connections if x.id == clientData["id"])
     if(user):
