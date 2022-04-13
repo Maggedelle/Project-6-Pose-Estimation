@@ -43,6 +43,27 @@ def normalizer():
                 pushups_f4.append(exercise["feature_4"])
                 pushups_f5.append(exercise["feature_5"])
 
+            print("arm curl feature_1 average",
+                  sum(armcurls_f1)/len(armcurls_f1))
+            """ print("arm curl feature 2 max: ", max(
+                armcurls_f2), ", min: ", min(armcurls_f2))
+            print("arm curl feature 3 max: ", max(
+                armcurls_f3), ", min: ", min(armcurls_f3))
+
+            print("armraise feature 1 max: ", max(
+                armraises_f1), ", min: ", min(armraises_f1))
+            print("armraise feature 2 max: ", max(
+                armraises_f2), ", min: ", min(armraises_f2))
+            print("armraise feature 3 max: ", max(
+                armraises_f3), ", min: ", min(armraises_f3)) """
+
+            print("push up feature  1 max: ", max(
+                pushups_f1), ", min: ", min(pushups_f1))
+            print("push up feature  4 max: ", max(
+                pushups_f4), ", min: ", min(pushups_f4))
+            print("push up feature  5 max: ", max(
+                pushups_f5), ", min: ", min(pushups_f5))
+
         for exercise in data:
             if(exercise["exercise"] == "armcurl"):
                 if(exercise["feature_1"] != 0):
