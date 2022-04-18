@@ -24,20 +24,18 @@ mpDraw = mp.solutions.drawing_utils
 mpPose = mp.solutions.pose
 
 
-async def receivedFrameData(connections):
-    for connection in connections:
+def receivedFrameData(connection):
         if(connection.currFrame != None):
-            img = await decodeBase64(connection.currFrame)
-            poseResults = await findPose(img, connection.pose)
-            features = await calculateAngles(poseResults, connection.currExercise, img)
-            await updateFeatureDict(connection, features)
-            if(await checkForIteration(features, connection) == True):
-                await sendNormalizedFeatures(connection)
+            img = decodeBase64(connection.currFrame)
+            poseResults = findPose(img, connection.pose)
+            features = calculateAngles(poseResults, connection.currExercise, img)
+            updateFeatureDict(connection, features)
+            if(checkForIteration(features, connection) == True):
+                sendNormalizedFeatures(connection)
                 connection.prevAngles = defaultdict(int)
-            await showFrame(img, fps, connection.id, poseResults)
 
 
-async def showFrame(frame: np.mat, fps: int, connectionId: str, poseResults=None):
+def showFrame(frame: np.mat, fps: int, connectionId: str, poseResults=None):
     if poseResults and poseResults.pose_landmarks:
         mpDraw.draw_landmarks(
             frame, poseResults.pose_landmarks, mpPose.POSE_CONNECTIONS)
@@ -45,12 +43,12 @@ async def showFrame(frame: np.mat, fps: int, connectionId: str, poseResults=None
     cv.waitKey(fps)
 
 
-async def findPose(frame: np.mat, pose):
-    results = pose.process(frame)
+def findPose(frame: np.mat, pose):
+    results = pose.process(cv.cvtColor(frame, cv.COLOR_BGR2RGB))
     return results
 
 
-async def updateFeatureDict(connection, features):
+def updateFeatureDict(connection, features):
     global countComputional
     if(features != None):
         countComputional = countComputional +1
@@ -62,9 +60,9 @@ async def updateFeatureDict(connection, features):
         connection.prevAngles["f5"] += features["f5"]
 
 
-async def checkForIteration(features, connection):
+def checkForIteration(features, connection):
     if(features != None):
-        if(connection.hasBeenUp and connection.currExercise == "armcurl" and features["f1"] > 160):
+        if(connection.hasBeenUp and connection.currExercise == "armcurl" and features["f1"] > 175):
             print("iteraion")
             connection.hasBeenUp = False
             return True
@@ -88,7 +86,7 @@ async def checkForIteration(features, connection):
         return False
 
 
-async def calculateAngles(poseResults, exercise, frame):
+def calculateAngles(poseResults, exercise, frame):
     features = dict()
     if(poseResults.pose_landmarks != None):
         coordinates = list_coordinates(
@@ -140,7 +138,7 @@ async def calculateAngles(poseResults, exercise, frame):
         return features
 
 
-async def sendNormalizedFeatures(connection):
+def sendNormalizedFeatures(connection):
     global countComputional
     print(countComputional)
     countComputional = 0
@@ -155,7 +153,7 @@ async def sendNormalizedFeatures(connection):
     
 
 
-async def decodeBase64(bytes: str):
+def decodeBase64(bytes: str):
     im_bytes = base64.b64decode(bytes)
     im_arr = np.frombuffer(im_bytes, dtype=np.uint8)
     img = cv.imdecode(im_arr, flags=cv.IMREAD_COLOR)

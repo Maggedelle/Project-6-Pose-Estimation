@@ -1,12 +1,13 @@
-import asyncio
 from collections import defaultdict
+from getpass import getuser
 from fastapi import FastAPI, WebSocket
 import uvicorn
 import poseEstimation
 import mediapipe as mp
 import calculator as calc
+import time, threading, queue
 import datetime as dt
-
+import sched
 app = FastAPI(title='ESMA API')
 mpPose = mp.solutions.pose
 
@@ -28,19 +29,42 @@ class connectionUser:
 
 connections = []
 
-@app.on_event("startup")
-async def on_startup():
-    asyncio.create_task(updateFrames())
+queue = []
 
-async def updateFrames():
+
+def startTime(connection):
+    queueThread = threading.Thread(target=updateQueue, args=(connection,))
+    queueThread.daemon = True
+    queueThread.start()
+
+    checkQueueThread = threading.Thread(target=updateFrames, args=(connection,))
+    checkQueueThread.daemon = True
+    checkQueueThread.start()
+
+
+
+def updateQueue(connection):
+    starttimes = time.time()
     while True:
-        await poseEstimation.receivedFrameData(connections)
-        await asyncio.sleep(0.041)
-async def updateConnection (clientData):
+        queue.append(connection)
+        time.sleep(0.04166 - ((time.time() - starttimes) % 0.04166))
+        
+
+def updateFrames(connection):
+    while True:
+        if(queue):
+            poseEstimation.receivedFrameData(queue[0])
+            queue.pop(0)
+        
+
+def updateConnection (clientData):
     user = next(x for x in connections if x.id == clientData["id"])
     if(user):
         user.currFrame = clientData["frame"]
         user.currExercise = clientData["exerciseType"]
+
+def getUser (id):
+    return next(x for x in connections if x.id == id)
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -51,8 +75,12 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_json()
             if(data["type"] == "init"):
                 connections.append(connectionUser(data["id"], mpPose.Pose()))
+                connection = getUser(data["id"]);
+                thread = threading.Thread(target=startTime, args=(connection,))
+                thread.daemon = True
+                thread.start()
             else:
-                await updateConnection(data)
+                updateConnection(data)
 
         except Exception as e:
             print("error: ", e)
