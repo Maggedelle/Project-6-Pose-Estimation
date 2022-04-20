@@ -8,18 +8,20 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import 'constants.dart';
+
 bool debug = false;
 bool sentImage = false;
 
 // A screen that allows users to take a picture using a given camera.
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({
-    Key? key,
-    required this.camera,
-    required this.channel,
-    required this.id,
-    required this.exerciseType
-  }) : super(key: key);
+  const CameraScreen(
+      {Key? key,
+      required this.camera,
+      required this.channel,
+      required this.id,
+      required this.exerciseType})
+      : super(key: key);
 
   final CameraDescription camera;
   final WebSocketChannel channel;
@@ -72,7 +74,7 @@ class CameraScreenState extends State<CameraScreen> {
   }
 
   void _processCameraImage(CameraImage image) async {
-    if (!sentImage) {
+    if (!sentImage && sendImageData == true) {
       final imageBytes = await convertImagetoPng(image);
 
       //Uint8List bytes = image.planes[1].bytes;
@@ -86,7 +88,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   Future sleep1() {
     return new Future.delayed(
-        const Duration(milliseconds: 42), () => sentImage = false);
+        const Duration(milliseconds: 20 ), () => sentImage = false);
   }
 
   Future<List<int>?> convertImagetoPng(CameraImage image) async {
@@ -149,20 +151,49 @@ class CameraScreenState extends State<CameraScreen> {
 
   Future<void> sendBytes(String bytes) async {
     try {
-      widget.channel.sink.add(
-          json.encode({"frame": bytes, "id": widget.id, "type": "sendImage", "exerciseType": widget.exerciseType}));
+      widget.channel.sink.add(json.encode({
+        "frame": bytes,
+        "id": widget.id,
+        "type": "sendImage",
+        "exerciseType": widget.exerciseType
+      }));
     } catch (e) {
       print("ERROR: " + e.toString());
     }
   }
 
+  Timer? countdownTimer;
+  Duration myDuration = Duration(seconds: 3);
+  void startTimer() {
+    countdownTimer =
+        Timer.periodic(Duration(seconds: 1), (_) => {
+          setCountDown(),
+          if(myDuration.inSeconds == 0) {
+            sendImageData = true
+          }
+
+          });
+  }
+
+  void setCountDown() {
+    final reduceSecondsBy = 1;
+    setState(() {
+      final seconds = myDuration.inSeconds - reduceSecondsBy;
+      if (seconds < 0) {
+        countdownTimer!.cancel();
+      } else {
+        myDuration = Duration(seconds: seconds);
+      }
+    });
+  }
+
+  bool showBeginButton = true;
+  bool showTimerText = false;
+  bool sendImageData = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Fitness App'),
-        foregroundColor: Colors.red,
-      ),
+      appBar: buildAppBar(),
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
       // controller has finished initializing.
@@ -171,38 +202,95 @@ class CameraScreenState extends State<CameraScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // If the Future is complete, display the preview.
-            return debug
-                ? AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: CameraPreview(_controller))
-                : CameraPreview(_controller);
+            return Container(
+                child: Stack(
+              children: <Widget>[
+                Transform.scale(
+                    scale: 1 /
+                        (_controller.value.aspectRatio *
+                            MediaQuery.of(context).size.aspectRatio),
+                    alignment: Alignment.topCenter,
+                    child: CameraPreview(_controller)),
+                myDuration.inSeconds != 0 && showTimerText == true
+                    ? Center(
+                        child: Stack(
+                        children: <Widget>[
+                          // Stroked text as border.
+                          Text(
+                            myDuration.inSeconds.remainder(60).toString(),
+                            style: TextStyle(
+                              fontSize: 150,
+                              foreground: Paint()
+                                ..style = PaintingStyle.stroke
+                                ..strokeWidth = 4
+                                ..color = Colors.black,
+                            ),
+                          ),
+                          // Solid text as fill.
+                          Text(
+                            myDuration.inSeconds.remainder(60).toString(),
+                            style: const TextStyle(
+                              fontSize: 150,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ))
+                    : Text("")
+              ],
+            ));
           } else {
             // Otherwise, display a loading indicator.
             return const Center(child: CircularProgressIndicator());
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color.fromARGB(255, 1, 148, 247),
-        splashColor: Colors.yellow,
-        // Provide an onPressed callback.
-        onPressed: () async {
-          setState(() {
-            debug ? debug = false : debug = true;
-          });
-          print(debug);
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {} catch (e) {
-            // If an error occurs, log the error to the console.
-            print(e);
-          }
-        },
-        child: const Icon(
-          Icons.display_settings,
-          color: Colors.black54,
-        ),
-      ),
+      floatingActionButton: showBeginButton
+          ? FloatingActionButton.extended(
+              backgroundColor: const Color.fromRGBO(181, 230, 29, 1),
+              splashColor: Colors.yellow,
+              label: Stack(
+                children: <Widget>[
+                  // Stroked text as border.
+                  Text(
+                    'Begin!',
+                    style: TextStyle(
+                      fontSize: 40,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 3
+                        ..color = Colors.black,
+                    ),
+                  ),
+                  // Solid text as fill.
+                  const Text(
+                    'Begin!',
+                    style: TextStyle(
+                      fontSize: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              extendedPadding: const EdgeInsets.all(100),
+              onPressed: () async {
+                setState(() {
+                  startTimer();
+                  showBeginButton = false;
+                  showTimerText = true;
+                });
+              },
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  AppBar buildAppBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: kPrimaryColor,
+      title: const Text("Your Online Fitness Coach"),
     );
   }
 }
