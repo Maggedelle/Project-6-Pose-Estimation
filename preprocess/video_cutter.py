@@ -36,7 +36,6 @@ pose = mppose.Pose()
 arm_angle_list, back_deviation_list, shoulder_angle_list, back_angle_list = [], [], [], []
 master_list = [arm_angle_list, back_deviation_list,
                shoulder_angle_list, back_angle_list]
-totalAmountFound = 0
 
 def calculateTimestampByFrame (frame):
     i = 0
@@ -47,6 +46,7 @@ def calculateTimestampByFrame (frame):
         if(i % 24 == 0):
             sec=math.ceil(sec)
     return sec
+totalAmountFound = 0
 
 #LABELS_LENGHT
 for i in range(LABELS_LENGHT):
@@ -55,6 +55,9 @@ for i in range(LABELS_LENGHT):
     frame = 0
     prevTime = 0
     hasBeenUp = False
+    if(i == 3 or i == 6 or i == 9 or i == 12 or i == 15 or i == 18 or i == 21):
+        totalAmountFound = 0
+    
     #30 frames persecond
     while True:
         frame +=1
@@ -71,22 +74,27 @@ for i in range(LABELS_LENGHT):
                     arm_angle_list.append(arm_angle)
                     back_deviation_list.append(calc.devation(
                         p[SHOULDER_LEFT], p[HIP_LEFT]))
-
                     if hasBeenUp and arm_angle > 160:
                         sec = frame / 24;
                         input_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/" + str(i) + ".wmv"
-                        output_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(totalAmountFound) + ".mp4" 
-                        
-                        with VideoFileClip(input_video_path) as video:
-                            new = video.subclip(round(float(prevTime),2), round(float(sec),2))
-                            new.write_videofile(output_video_path, codec="libx264")
+                        output_video_path_correct = "C:/P6/Project-6-Pose-Estimation/dataset/singles/armcurl/correct/" + str(totalAmountFound) + ".mp4" 
+                        output_video_path_incorrect = "C:/P6/Project-6-Pose-Estimation/dataset/singles/armcurl/incorrect/" + str(totalAmountFound) + ".mp4" 
+                        if(i <= 2):
+                            with VideoFileClip(input_video_path) as video:
+                                new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                                new.write_videofile(output_video_path_correct, codec="libx264")
+                        else:
+                            with VideoFileClip(input_video_path) as video:
+                                new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                                new.write_videofile(output_video_path_incorrect, codec="libx264")
+
                         print("found an exercise ", sec, frame, prevTime)
                         totalAmountFound+=1
                         prevTime = sec
                         hasBeenUp = False
                         cv2.imshow("Image", img)
                         cv2.waitKey(100)
-                        
+                 
 
                     if arm_angle < 60:
                         hasBeenUp = True
@@ -101,10 +109,16 @@ for i in range(LABELS_LENGHT):
                     if hasBeenUp and arm_angle < 10:
                         sec = frame / 24
                         input_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/" + str(i) + ".wmv"
-                        output_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(totalAmountFound) + ".mp4"
-                        with VideoFileClip(input_video_path) as video:
-                            new = video.subclip(round(float(prevTime),2), round(float(sec),2))
-                            new.write_videofile(output_video_path, codec="libx264")
+                        output_video_path_correct = "C:/P6/Project-6-Pose-Estimation/dataset/singles/armraise/correct/" + str(totalAmountFound) + ".mp4" 
+                        output_video_path_incorrect = "C:/P6/Project-6-Pose-Estimation/dataset/singles/armraise/incorrect/" + str(totalAmountFound) + ".mp4" 
+                        if(i <= 8):
+                            with VideoFileClip(input_video_path) as video:
+                                new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                                new.write_videofile(output_video_path_correct, codec="libx264")
+                        else:
+                            with VideoFileClip(input_video_path) as video:
+                                new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                                new.write_videofile(output_video_path_incorrect, codec="libx264")
                         print("found an exercise ", sec, frame, prevTime)
                         totalAmountFound+=1
                         prevTime = sec
@@ -126,10 +140,16 @@ for i in range(LABELS_LENGHT):
                     if hasBeenUp and shoulder_angle > 145:
                         sec = frame / 24
                         input_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/" + str(i) + ".wmv"
-                        output_video_path = "C:/P6/Project-6-Pose-Estimation/dataset/singles/" + str(totalAmountFound) + ".mp4"
-                        with VideoFileClip(input_video_path) as video:
-                            new = video.subclip(round(float(prevTime),2), round(float(sec),2))
-                            new.write_videofile(output_video_path, codec="libx264")
+                        output_video_path_correct = "C:/P6/Project-6-Pose-Estimation/dataset/singles/pushup/correct/" + str(totalAmountFound) + ".mp4" 
+                        output_video_path_incorrect = "C:/P6/Project-6-Pose-Estimation/dataset/singles/pushup/incorrect/" + str(totalAmountFound) + ".mp4" 
+                        if(i <= 14):
+                            with VideoFileClip(input_video_path) as video:
+                                new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                                new.write_videofile(output_video_path_correct, codec="libx264")
+                        else:
+                            with VideoFileClip(input_video_path) as video:
+                                new = video.subclip(round(float(prevTime),2), round(float(sec),2))
+                                new.write_videofile(output_video_path_incorrect, codec="libx264")
                         print("found an exercise ", sec, frame, prevTime)
                         totalAmountFound+=1
                         prevTime = sec
