@@ -62,7 +62,7 @@ def updateFeatureDict(connection, features):
 
 def checkForIteration(features, connection):
     if(features != None):
-        if(connection.hasBeenUp and connection.currExercise == "armcurl" and features["f1"] > 175):
+        if(connection.hasBeenUp and connection.currExercise == "armcurl" and features["f1"] > 160):
             print("iteraion")
             connection.hasBeenUp = False
             return True

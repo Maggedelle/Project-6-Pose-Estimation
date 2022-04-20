@@ -88,7 +88,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   Future sleep1() {
     return new Future.delayed(
-        const Duration(milliseconds: 20), () => sentImage = false);
+        const Duration(milliseconds: 20 ), () => sentImage = false);
   }
 
   Future<List<int>?> convertImagetoPng(CameraImage image) async {

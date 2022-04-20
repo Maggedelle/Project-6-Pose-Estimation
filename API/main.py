@@ -20,16 +20,16 @@ class connectionUser:
         self.currExercise = None
         self.prevAngles = defaultdict(int)
         self.hasBeenUp = False
+        self.queue = []
     id: str
     pose:any
     currFrame: str
     currExercise: str
     prevAngles: dict()
     hasBeenUp: bool
+    queue: list
 
 connections = []
-
-queue = []
 
 
 def startTime(connection):
@@ -46,15 +46,15 @@ def startTime(connection):
 def updateQueue(connection):
     starttimes = time.time()
     while True:
-        queue.append(connection)
+        connection.queue.append(connection)
         time.sleep(0.04166 - ((time.time() - starttimes) % 0.04166))
         
 
 def updateFrames(connection):
     while True:
-        if(queue):
-            poseEstimation.receivedFrameData(queue[0])
-            queue.pop(0)
+        if(connection.queue):
+            poseEstimation.receivedFrameData(connection.queue[0])
+            connection.queue.pop(0)
         
 
 def updateConnection (clientData):
