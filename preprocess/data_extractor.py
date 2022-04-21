@@ -100,9 +100,9 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                                 {'id': id_,
                                     'exercise': exercise_folder,
                                     'correct': find_correctness(correctness),
-                                    'feature_correct_1': find_correctness(correctness),
-                                    'feature_correct_2': find_correctness(correctness),
-                                    'feature_correct_3': find_correctness(correctness),
+                                    'feature_1_angle_correct': find_correctness(correctness),
+                                    'feature_1_angle_wide': find_correctness(correctness),
+                                    'feature_1_angle_narrow': find_correctness(correctness),
                                     'feature_armcurl': 1,
                                     'feature_armraise': 0,
                                     'feature_pushup': 0,
@@ -117,9 +117,9 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                                 {'id': id_,
                                     'exercise': exercise_folder,
                                     'correct': find_correctness(correctness),
-                                    'feature_correct_1': find_correctness(correctness),
-                                    'feature_correct_2': find_correctness(correctness),
-                                    'feature_correct_3': find_correctness(correctness),
+                                    'feature_1_angle_correct': find_correctness(correctness),
+                                    'feature_1_angle_wide': find_correctness(correctness),
+                                    'feature_1_angle_narrow': find_correctness(correctness),
                                     'feature_armcurl': 0,
                                     'feature_armraise': 1,
                                     'feature_pushup': 0,
@@ -134,9 +134,9 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                                 {'id': id_,
                                     'exercise': exercise_folder,
                                     'correct': find_correctness(correctness),
-                                    'feature_correct_1': find_correctness(correctness),
-                                    'feature_correct_2': find_correctness(correctness),
-                                    'feature_correct_3': find_correctness(correctness),
+                                    'feature_1_angle_correct': find_correctness(correctness),
+                                    'feature_1_angle_wide': find_correctness(correctness),
+                                    'feature_1_angle_narrow': find_correctness(correctness),
                                     'feature_armcurl': 0,
                                     'feature_armraise': 0,
                                     'feature_pushup': 1,
@@ -154,5 +154,5 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                         break
                 id_ += 1
     json.dump(data, f)
-print("Data extracted ✔️")
+print("Data extracted")
 normalization.normalizer()
