@@ -96,13 +96,38 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                     except Exception as e:
                         # print(e)
                         if exercise_folder == 'armcurl':
+                            f1w, f1n, f1c = 0, 0, 0
+                            f2c, f2_bend = 0, 0
+                            f3w, f3n, f3c = 0, 0, 0
+                            if sum(arm_angle_list.copy()) > 6000:
+                                f1w = 1
+                            elif sum(arm_angle_list.copy()) < 4000:
+                                f1n = 1
+                            else:
+                                f1c = 1
+                            if 200 < sum(back_deviation_list.copy()) and sum(back_deviation_list.copy()) > 600:
+                                f2c = 1
+                            else:
+                                f2_bend = 1
+
+                            if sum(shoulder_angle_list.copy()) > 16000:
+                                f3w = 1
+                            elif sum(shoulder_angle_list.copy()) < 8000:
+                                f3n = 1
+                            else:
+                                f3c = 1
                             data.append(
                                 {'id': id_,
                                     'exercise': exercise_folder,
                                     'correct': find_correctness(correctness),
-                                    'feature_1_angle_correct': find_correctness(correctness),
-                                    'feature_1_angle_wide': find_correctness(correctness),
-                                    'feature_1_angle_narrow': find_correctness(correctness),
+                                    'feature_1_angle_correct': f1c,
+                                    'feature_1_angle_wide': f1w,
+                                    'feature_1_angle_narrow': f1n,
+                                    'feature_2_back_correct': f2c,
+                                    'feature_2_back_bend': f2_bend,
+                                    'feature_3_angle_correct': f3c,
+                                    'feature_3_angle_wide': f3w,
+                                    'feature_3_angle_narrow': f3n,
                                     'feature_armcurl': 1,
                                     'feature_armraise': 0,
                                     'feature_pushup': 0,
@@ -113,13 +138,41 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                                     'feature_5': 0
                                  })
                         elif exercise_folder == 'armraise':
+                            f1w, f1n, f1c = 0, 0, 0
+                            f2_bend, f2c = 0, 0
+                            f3w, f3n, f3c = 0, 0, 0
+
+                            if sum(arm_angle_list.copy()) > 11000:
+                                f1w = 1
+                            elif sum(arm_angle_list.copy()) < 7500:
+                                f1n = 1
+                            else:
+                                f1c = 1
+
+                            if 700 < sum(back_deviation_list.copy()) and sum(back_deviation_list.copy()) > 1300:
+                                f2c = 1
+                            else:
+                                f2_bend = 1
+
+                            if sum(shoulder_angle_list.copy()) > 3200:
+                                f3w = 1
+                            elif sum(shoulder_angle_list.copy()) < 2500:
+                                f3n = 1
+                            else:
+                                f3c = 1
+
                             data.append(
                                 {'id': id_,
                                     'exercise': exercise_folder,
                                     'correct': find_correctness(correctness),
-                                    'feature_1_angle_correct': find_correctness(correctness),
-                                    'feature_1_angle_wide': find_correctness(correctness),
-                                    'feature_1_angle_narrow': find_correctness(correctness),
+                                    'feature_1_angle_correct': f1c,
+                                    'feature_1_angle_wide': f1w,
+                                    'feature_1_angle_narrow': f1n,
+                                    'feature_2_back_correct': f2c,
+                                    'feature_2_back_bend': f2_bend,
+                                    'feature_3_angle_correct': f3c,
+                                    'feature_3_angle_wide': f3w,
+                                    'feature_3_angle_narrow': f3n,
                                     'feature_armcurl': 0,
                                     'feature_armraise': 1,
                                     'feature_pushup': 0,
@@ -130,13 +183,42 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
                                     'feature_5': 0
                                  })
                         elif exercise_folder == 'pushup':
+                            f1_high, f1_low, f1c = 0, 0, 0
+                            f4_bend, f4c = 0, 0
+                            # Used to check indicate how the hips are bending
+                            f5_high_bend, f5_low_bend, f5c = 0, 0, 0
+
+                            if sum(arm_angle_list.copy()) > 5000:
+                                f1_high = 1
+                            elif sum(arm_angle_list.copy()) < 4000:
+                                f1_low = 1
+                            else:
+                                f1c = 1
+
+                            if 6400 < sum(leg_angle_list.copy()) and sum(leg_angle_list.copy()) < 7400:
+                                f4_bend = 1
+                            else:
+                                f4c = 1
+
+                            if sum(hip_angle_list.copy()) > 8200:
+                                f5_high_bend = 1
+                            elif sum(hip_angle_list.copy()) < 7100:
+                                f5_low_bend = 1
+                            else:
+                                f5c = 1
+
                             data.append(
                                 {'id': id_,
                                     'exercise': exercise_folder,
                                     'correct': find_correctness(correctness),
-                                    'feature_1_angle_correct': find_correctness(correctness),
-                                    'feature_1_angle_wide': find_correctness(correctness),
-                                    'feature_1_angle_narrow': find_correctness(correctness),
+                                    'feature_1_angle_correct': f1c,
+                                    'feature_1_angle_wide': f1w,
+                                    'feature_1_angle_narrow': f1n,
+                                    'feature_2_back_correct': f4c,
+                                    'feature_2_back_bend': f4_bend,
+                                    'feature_3_angle_correct': f5c,
+                                    'feature_3_angle_wide': f5_high_bend,
+                                    'feature_3_angle_narrow': f5_low_bend,
                                     'feature_armcurl': 0,
                                     'feature_armraise': 0,
                                     'feature_pushup': 1,

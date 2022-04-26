@@ -11,9 +11,9 @@ from sklearn.model_selection import KFold
 dataset = pd.read_json("preprocess/labels.json")
 result, fold_iteration = list(), 0
 
-input_layer = FCLayer(8, 5)
-middel_layer = FCLayer(5, 3)
-output_layer = FCLayer(3, 4)
+input_layer = FCLayer(8, 16)
+middel_layer = FCLayer(16, 12)
+output_layer = FCLayer(12, 9)
 
 input_layer.weights = load('weights', 0)
 input_layer.bias = load('bias', 0)
@@ -36,11 +36,11 @@ net.use(mse, mse_prime)
 kf5 = KFold(n_splits=4, shuffle=True)
 for train_index, test_index in kf5.split(range(len(dataset))):
 
-    x_train = dataset.iloc[train_index].iloc[:, 6:].values
-    x_test = dataset.iloc[test_index].iloc[:, 6:].values
+    x_train = dataset.iloc[train_index].iloc[:, 11:].values
+    x_test = dataset.iloc[test_index].iloc[:, 11:].values
 
-    y_train = dataset.iloc[train_index].iloc[:, 2:6].values
-    y_test = dataset.iloc[test_index].iloc[:, 2:6].values
+    y_train = dataset.iloc[train_index].iloc[:, 2:11].values
+    y_test = dataset.iloc[test_index].iloc[:, 2:11].values
 
     x_train = x_train.reshape(x_train.shape[0], 1, 1*8)
     x_train = x_train.astype('float32')
@@ -48,7 +48,7 @@ for train_index, test_index in kf5.split(range(len(dataset))):
     x_test = x_test.reshape(x_test.shape[0], 1, 1*8)
     x_test = x_test.astype('float32')
 
-    net.fit(x_train, y_train, epochs=1000,
+    net.fit(x_train, y_train, epochs=10000,
             learning_rate=0.025, save_weights=save)
     out = net.predict(x_test)
 
@@ -56,12 +56,12 @@ for train_index, test_index in kf5.split(range(len(dataset))):
     for i in range(len(out)):
         for j in range(len(out[i])):
             for k in range(len(out[i][j])):
-                if(out[i][j][k] >= 0.9 and y_test[i][j] == 1):
+                if(out[i][j][k] >= 0.9 and y_test[i][k] == 1):
                     count += 1
-                elif(out[i][j][k] < 0.1 and y_test[i][j] == 0):
+                elif(out[i][j][k] < 0.1 and y_test[i][k] == 0):
                     count += 1
             print("prediction: ", out[i][j], ", actual value: ", y_test[i])
-    accuracy = (count/4)*100 / len(out)
+    accuracy = count*100 / (len(out)*9)
     result.append(accuracy)
     fold_iteration += 1
 
