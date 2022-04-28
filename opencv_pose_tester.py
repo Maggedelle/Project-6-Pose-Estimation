@@ -1,3 +1,4 @@
+from tabnanny import check
 import cv2
 import mediapipe as mp
 import time
@@ -51,37 +52,42 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-cap = cv2.VideoCapture('dataset/armcurl/correct/2.mp4')
+cap = cv2.VideoCapture('C:/P6/Project-6-Pose-Estimation/dataset/singles/armcurl/correct/2.mp4')
 #cap = cv2.VideoCapture(0)
 time_b = 0
+sumes = 0
+check_frames = 0
 while True:
     success, img = cap.read()
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     result = pose.process(imgRGB)
-
+    
     if result.pose_landmarks:
         mp_draw.draw_landmarks(img, result.pose_landmarks,
                                mppose.POSE_CONNECTIONS)
         plist = list_coordinates(img, result.pose_landmarks.landmark)
 
         cv2.putText(img, str(int(calc_angle(
-            plist[HIP_LEFT], plist[SHOULDER_LEFT], plist[ELBOW_LEFT]))), (plist[ELBOW_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
+            plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT]))), (plist[SHOULDER_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
+        sumes+=calc_angle(
+            plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT])
+        check_frames+=1;
       #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
        #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
        # cv2.putText(img, str(int(calc_angle(plist[24], plist[12], plist[14]))), (plist[12][1] - 50, plist[12][2] + 30),
         #            cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
         # cv2.putText(img, str(int(calc_angle(plist[13], plist[11], plist[23]))), (plist[11][1] - 50, plist[11][2] + 30),
         #           cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-
-        print(calc_angle(plist[24], plist[26], plist[28]))
-        print(plist)
-
+    print(sumes)
+    print(check_frames)
+       
+    
     time_a = time.time()
     fps = 1/(time_a-time_b)
     time_b = time_a
 
-    cv2.putText(img, "fps: " + str(int(fps)), (70, 50),
+    cv2.putText(img, "fps: " + str(cap.get(cv2.CAP_PROP_FPS)), (70, 50),
                 cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 0), 3)
     cv2.imshow("Image", img)
-    cv2.waitKey(400)
+    cv2.waitKey(42)
