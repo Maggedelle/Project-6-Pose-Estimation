@@ -1,14 +1,17 @@
 from collections import defaultdict
 from getpass import getuser
 from fastapi import FastAPI, WebSocket
+from pyparsing import And
 import uvicorn
 import poseEstimation
 import mediapipe as mp
 import calculator as calc
 import time, threading, queue
 import datetime as dt
-import sched
+import json
 app = FastAPI(title='ESMA API')
+
+
 mpPose = mp.solutions.pose
 
 
@@ -18,16 +21,18 @@ class connectionUser:
         self.currFrame = None
         self.pose = pose
         self.currExercise = None
-        self.prevAngles = defaultdict(int)
+        self.features = defaultdict(int)
         self.hasBeenUp = False
         self.queue = []
+        self.prediction = []
     id: str
     pose:any
     currFrame: str
     currExercise: str
-    prevAngles: dict()
+    features: dict()
     hasBeenUp: bool
     queue: list
+    prediction:any
 
 connections = []
 
@@ -66,6 +71,7 @@ def updateConnection (clientData):
 def getUser (id):
     return next(x for x in connections if x.id == id)
 
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -81,6 +87,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 thread.start()
             else:
                 updateConnection(data)
+                user = getUser(data["id"])
+                if(user.prediction):
+                    await websocket.send_json(json.dumps(user.prediction))
+                    user.prediction = []
 
         except Exception as e:
             print("error: ", e)

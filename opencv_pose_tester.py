@@ -17,6 +17,8 @@ KNEE_RIGHT = 26
 ANKLE_LEFT = 27
 ANKLE_RIGHT = 28
 
+def devation(x, y):
+    return abs((x[1] - y[1]))
 
 def calc_angle(p1, p2, p3):
     vector_ab = p1[1] - p2[1], p1[2] - p2[2]
@@ -52,10 +54,12 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-cap = cv2.VideoCapture('C:/P6/Project-6-Pose-Estimation/dataset/singles/armcurl/correct/2.mp4')
+cap = cv2.VideoCapture('C:/P6/Project-6-Pose-Estimation/dataset/amatuer/thomas.wmv')
 #cap = cv2.VideoCapture(0)
 time_b = 0
 sumes = 0
+sum2 = 0;
+sum3 = 0;
 check_frames = 0
 while True:
     success, img = cap.read()
@@ -72,6 +76,9 @@ while True:
             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
         sumes+=calc_angle(
             plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT])
+        sum2+=calc_angle(
+                    plist[ELBOW_LEFT], plist[SHOULDER_LEFT], plist[HIP_LEFT])
+        sum3+=devation(plist[SHOULDER_LEFT], plist[HIP_LEFT])
         check_frames+=1;
       #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
        #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
@@ -80,6 +87,8 @@ while True:
         # cv2.putText(img, str(int(calc_angle(plist[13], plist[11], plist[23]))), (plist[11][1] - 50, plist[11][2] + 30),
         #           cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
     print(sumes)
+    print(sum2)
+    print(sum3)
     print(check_frames)
        
     
