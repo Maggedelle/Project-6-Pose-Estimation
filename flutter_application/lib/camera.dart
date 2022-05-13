@@ -35,7 +35,9 @@ class CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
-  @override
+  
+
+  @override 
   void initState() {
     super.initState();
     // To display the current output from the Camera,
@@ -59,7 +61,17 @@ class CameraScreenState extends State<CameraScreen> {
     } catch (e) {
       print(e);
     }
+
+    widget.channel.stream.listen(
+    (data) {
+      setState(() {
+        serverResponse = data;
+      });
+    },
+    onError: (error) => print(error),
+  );
   }
+
 
   @override
   void dispose() {
@@ -164,6 +176,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   Timer? countdownTimer;
   Duration myDuration = Duration(seconds: 3);
+  String serverResponse = "";
   void startTimer() {
     countdownTimer =
         Timer.periodic(Duration(seconds: 1), (_) => {
@@ -211,6 +224,11 @@ class CameraScreenState extends State<CameraScreen> {
                             MediaQuery.of(context).size.aspectRatio),
                     alignment: Alignment.topCenter,
                     child: CameraPreview(_controller)),
+                    Center(
+                      child: Text(serverResponse, style: TextStyle(
+                          fontSize: 50
+                      )),
+                    ),
                 myDuration.inSeconds != 0 && showTimerText == true
                     ? Center(
                         child: Stack(

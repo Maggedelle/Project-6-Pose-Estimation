@@ -89,7 +89,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 updateConnection(data)
                 user = getUser(data["id"])
                 if(user.prediction):
-                    await websocket.send_json(json.dumps(user.prediction))
+                    if(user.prediction[0] > 0.9):
+                        await websocket.send_text("correct")
+                        print("correct ", user.prediction[0])
+                    else:
+                        await websocket.send_text("incorrect")
+                        print("incorrect ", user.prediction[0])
+                    #print(json.dumps(user.prediction))
                     user.prediction = []
 
         except Exception as e:

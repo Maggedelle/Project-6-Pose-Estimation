@@ -69,8 +69,8 @@ def checkForIteration(features, connection):
             print("iteraion")
             connection.hasBeenUp = False
             return True
-
-        elif(connection.hasBeenUp and connection.currExercise == "armraise" and features["f1"] < 10):
+    
+        elif(connection.hasBeenUp and connection.currExercise == "armraise" and features["f3"] < 10):
             print("iteration")
             connection.hasBeenUp = False
             return True
@@ -81,7 +81,7 @@ def checkForIteration(features, connection):
 
         if(connection.currExercise == "armcurl" and features["f1"] < 60):
             connection.hasBeenUp = True
-        elif(connection.currExercise == "armraise" and features["f1"] > 80):
+        elif(connection.currExercise == "armraise" and features["f3"] > 80 and features["f3"] < 100):
             connection.hasBeenUp = True
         elif(connection.currExercise == "pushup" and features["f1"] > 145):
             connection.hasBeenUp = True
@@ -167,8 +167,8 @@ def normalizeFeatures(connection):
 
 
 def setPrediction(connection):
-    print(connection.features);
     normalizeFeatures(connection)
+    print(connection.features);
     data = np.array([list(connection.features.values())])
     connection.prediction = network.predict(data)
 
