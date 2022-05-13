@@ -1,15 +1,16 @@
-from collections import defaultdict
-import numpy as np
-import cv2 as cv
-import base64
-import mediapipe as mp
-import calculator as calc
-import const
 import sys
+import const
+import calculator as calc
+import mediapipe as mp
+import base64
+import cv2 as cv
+import numpy as np
+from collections import defaultdict
 sys.path.insert(0, './trainer')
 from neural_network_class import Network_class
 
 network = Network_class()
+
 
 def list_coordinates(img, landmarks):
     poselist = []
@@ -28,14 +29,14 @@ mpPose = mp.solutions.pose
 
 
 def receivedFrameData(connection):
-        if(connection.currFrame != None):
-            img = decodeBase64(connection.currFrame)
-            poseResults = findPose(img, connection.pose)
-            features = calculateAngles(poseResults, connection.currExercise, img)
-            updateFeatureDict(connection, features)
-            if(checkForIteration(features, connection) == True):
-                setPrediction(connection)
-                connection.features = defaultdict(int)
+    if(connection.currFrame != None):
+        img = decodeBase64(connection.currFrame)
+        poseResults = findPose(img, connection.pose)
+        features = calculateAngles(poseResults, connection.currExercise, img)
+        updateFeatureDict(connection, features)
+        if(checkForIteration(features, connection) == True):
+            setPrediction(connection)
+            connection.features = defaultdict(int)
 
 
 def showFrame(frame: np.mat, fps: int, connectionId: str, poseResults=None):
@@ -69,7 +70,7 @@ def checkForIteration(features, connection):
             print("iteraion")
             connection.hasBeenUp = False
             return True
-    
+
         elif(connection.hasBeenUp and connection.currExercise == "armraise" and features["f3"] < 10):
             print("iteration")
             connection.hasBeenUp = False
@@ -83,7 +84,7 @@ def checkForIteration(features, connection):
             connection.hasBeenUp = True
         elif(connection.currExercise == "armraise" and features["f3"] > 80 and features["f3"] < 100):
             connection.hasBeenUp = True
-        elif(connection.currExercise == "pushup" and features["f1"] > 145):
+        elif(connection.currExercise == "pushup" and features["f1"] < 80):
             connection.hasBeenUp = True
 
         return False
@@ -129,7 +130,7 @@ def calculateAngles(poseResults, exercise, frame):
                 arm_angle = calc.angle(
                     coordinates[const.SHOULDER_LEFT], coordinates[const.ELBOW_LEFT], coordinates[const.WRIST_LEFT])
                 leg_angle = calc.angle(
-                    coordinates[const.ANKLE_LEFT, coordinates[const.KNEE_LEFT], coordinates[const.HIP_LEFT]])
+                    coordinates[const.ANKLE_LEFT], coordinates[const.KNEE_LEFT], coordinates[const.HIP_LEFT])
                 hip_angle = calc.angle(
                     coordinates[const.KNEE_LEFT], coordinates[const.HIP_LEFT], coordinates[const.SHOULDER_LEFT])
                 features["f1"] = arm_angle
@@ -141,25 +142,27 @@ def calculateAngles(poseResults, exercise, frame):
         return features
 
 
-
 def normalizeFeatures(connection):
     if(connection.currExercise == "armcurl"):
         connection.features["feature_armcurl"] = 1
-        connection.features["f1"] = (connection.features["f1"] - const.ARM_CURL_FEATURE1_MIN) / (const.ARM_CURL_FEATURE1_MAX - const.ARM_CURL_FEATURE1_MIN)
+        connection.features["f1"] = (connection.features["f1"] - const.ARM_CURL_FEATURE1_MIN) / (
+            const.ARM_CURL_FEATURE1_MAX - const.ARM_CURL_FEATURE1_MIN)
         connection.features["f2"] = (connection.features["f2"] - const.ARM_CURL_FEATURE2_MIN) / \
             (const.ARM_CURL_FEATURE2_MAX - const.ARM_CURL_FEATURE2_MIN)
         connection.features["f3"] = (connection.features["f3"] - const.ARM_CURL_FEATURE3_MIN) / \
             (const.ARM_CURL_FEATURE3_MAX - const.ARM_CURL_FEATURE3_MIN)
     elif(connection.currExercise == "armraise"):
         connection.features["feature_armraise"] = 1
-        connection.features["f1"] = connection.features["f1"] - const.ARM_RAISE_FEATURE1_MIN / const.ARM_RAISE_FEATURE1_MAX - const.ARM_CURL_FEATURE1_MIN
+        connection.features["f1"] = connection.features["f1"] - const.ARM_RAISE_FEATURE1_MIN / \
+            const.ARM_RAISE_FEATURE1_MAX - const.ARM_CURL_FEATURE1_MIN
         connection.features["f2"] = (connection.features["f2"] - const.ARM_RAISE_FEATURE2_MIN) / \
             const.ARM_RAISE_FEATURE2_MAX - const.ARM_RAISE_FEATURE2_MIN
         connection.features["f3"] = (connection.features["f3"] - const.ARM_RAISE_FEATURE3_MIN) / \
             const.ARM_RAISE_FEATURE3_MAX - const.ARM_RAISE_FEATURE3_MIN
     elif(connection.currExercise == "pushup"):
         connection.features["feature_pushup"] = 1
-        connection.features["f1"] = connection.features["f1"] - const.PUSH_UP_FEATURE1_MIN / const.PUSH_UP_FEATURE1_MAX - const.PUSH_UP_FEATURE1_MIN
+        connection.features["f1"] = connection.features["f1"] - \
+            const.PUSH_UP_FEATURE1_MIN / const.PUSH_UP_FEATURE1_MAX - const.PUSH_UP_FEATURE1_MIN
         connection.features["f4"] = (connection.features["f4"] - const.PUSH_UP_FEATURE4_MIN) / \
             const.PUSH_UP_FEATURE4_MAX - const.PUSH_UP_FEATURE4_MIN
         connection.features["f5"] = (connection.features["f5"] - const.PUSH_UP_FEATURE5_MIN) / \
@@ -168,7 +171,7 @@ def normalizeFeatures(connection):
 
 def setPrediction(connection):
     normalizeFeatures(connection)
-    print(connection.features);
+    print(connection.features)
     data = np.array([list(connection.features.values())])
     connection.prediction = network.predict(data)
 
