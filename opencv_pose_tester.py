@@ -17,8 +17,10 @@ KNEE_RIGHT = 26
 ANKLE_LEFT = 27
 ANKLE_RIGHT = 28
 
+
 def devation(x, y):
     return abs((x[1] - y[1]))
+
 
 def calc_angle(p1, p2, p3):
     vector_ab = p1[1] - p2[1], p1[2] - p2[2]
@@ -44,7 +46,7 @@ def list_coordinates(img, landmarks):
     for index, landmark in enumerate(landmarks):
         height, width, not_used = img.shape
         x, y = int(width * landmark.x), int(height * landmark.y)
-        poselist.append([index, x, y])
+        poselist.append([index, landmark.x, landmark.y])
 
     return poselist
 
@@ -54,32 +56,29 @@ mppose = mp.solutions.pose
 
 pose = mppose.Pose()
 
-cap = cv2.VideoCapture('C:/P6/Project-6-Pose-Estimation/dataset/amatuer/thomas.wmv')
+#cap = cv2.VideoCapture("unknown.png")
+img = cv2.imread("unknown2.png", cv2.IMREAD_COLOR)
 #cap = cv2.VideoCapture(0)
 time_b = 0
-sumes = 0
-sum2 = 0;
-sum3 = 0;
+sumes = []
+sum2 = 0
+sum3 = 0
 check_frames = 0
 while True:
-    success, img = cap.read()
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     result = pose.process(imgRGB)
-    
+
     if result.pose_landmarks:
         mp_draw.draw_landmarks(img, result.pose_landmarks,
                                mppose.POSE_CONNECTIONS)
         plist = list_coordinates(img, result.pose_landmarks.landmark)
 
-        cv2.putText(img, str(int(calc_angle(
-            plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT]))), (plist[SHOULDER_LEFT][1] - 50, plist[ELBOW_LEFT][2] + 30),
-            cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
-        sumes+=calc_angle(
-            plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT])
-        sum2+=calc_angle(
-                    plist[ELBOW_LEFT], plist[SHOULDER_LEFT], plist[HIP_LEFT])
-        sum3+=devation(plist[SHOULDER_LEFT], plist[HIP_LEFT])
-        check_frames+=1;
+        sumes.append(calc_angle(
+            plist[WRIST_LEFT], plist[ELBOW_LEFT], plist[SHOULDER_LEFT]))
+        sum2 += calc_angle(
+            plist[ELBOW_LEFT], plist[SHOULDER_LEFT], plist[HIP_LEFT])
+        sum3 += devation(plist[SHOULDER_LEFT], plist[HIP_LEFT])
+        check_frames += 1
       #  cv2.putText(img, str(int(calc_angle(plist[23], plist[25], plist[27]))), (plist[25][1] - 50, plist[25][2] + 30),
        #             cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255))
        # cv2.putText(img, str(int(calc_angle(plist[24], plist[12], plist[14]))), (plist[12][1] - 50, plist[12][2] + 30),
@@ -90,13 +89,12 @@ while True:
     print(sum2)
     print(sum3)
     print(check_frames)
-       
-    
+
     time_a = time.time()
     fps = 1/(time_a-time_b)
     time_b = time_a
 
-    cv2.putText(img, "fps: " + str(cap.get(cv2.CAP_PROP_FPS)), (70, 50),
-                cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 0), 3)
+    """ cv2.putText(img, "fps: " + str(cap.get(cv2.CAP_PROP_FPS)), (70, 50),
+                cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 0), 3) """
     cv2.imshow("Image", img)
-    cv2.waitKey(42)
+    cv2.waitKey(0)

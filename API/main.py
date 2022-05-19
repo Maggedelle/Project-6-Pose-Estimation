@@ -6,7 +6,9 @@ import uvicorn
 import poseEstimation
 import mediapipe as mp
 import calculator as calc
-import time, threading, queue
+import time
+import threading
+import queue
 import datetime as dt
 import json
 app = FastAPI(title='ESMA API')
@@ -26,13 +28,14 @@ class connectionUser:
         self.queue = []
         self.prediction = []
     id: str
-    pose:any
+    pose: any
     currFrame: str
     currExercise: str
     features: dict()
     hasBeenUp: bool
     queue: list
-    prediction:any
+    prediction: any
+
 
 connections = []
 
@@ -42,10 +45,10 @@ def startTime(connection):
     queueThread.daemon = True
     queueThread.start()
 
-    checkQueueThread = threading.Thread(target=updateFrames, args=(connection,))
+    checkQueueThread = threading.Thread(
+        target=updateFrames, args=(connection,))
     checkQueueThread.daemon = True
     checkQueueThread.start()
-
 
 
 def updateQueue(connection):
@@ -53,22 +56,23 @@ def updateQueue(connection):
     while True:
         connection.queue.append(connection)
         time.sleep(0.04166 - ((time.time() - starttimes) % 0.04166))
-        
+
 
 def updateFrames(connection):
     while True:
         if(connection.queue):
             poseEstimation.receivedFrameData(connection.queue[0])
             connection.queue.pop(0)
-        
 
-def updateConnection (clientData):
+
+def updateConnection(clientData):
     user = next(x for x in connections if x.id == clientData["id"])
     if(user):
         user.currFrame = clientData["frame"]
         user.currExercise = clientData["exerciseType"]
 
-def getUser (id):
+
+def getUser(id):
     return next(x for x in connections if x.id == id)
 
 
@@ -81,7 +85,7 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_json()
             if(data["type"] == "init"):
                 connections.append(connectionUser(data["id"], mpPose.Pose()))
-                connection = getUser(data["id"]);
+                connection = getUser(data["id"])
                 thread = threading.Thread(target=startTime, args=(connection,))
                 thread.daemon = True
                 thread.start()
@@ -89,6 +93,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 updateConnection(data)
                 user = getUser(data["id"])
                 if(user.prediction):
+                    print(user.prediction)
                     await websocket.send_json(json.dumps(user.prediction))
                     user.prediction = []
 

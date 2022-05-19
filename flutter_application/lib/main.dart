@@ -13,6 +13,7 @@ import 'package:flutter_application/homeScreen/homeScreen.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations(
@@ -22,7 +23,7 @@ void main() async {
   final cameras = await availableCameras();
 
   final channel = WebSocketChannel.connect(
-    Uri.parse('ws://192.168.87.181:5000/ws'),
+    Uri.parse('ws://192.168.1.131:5000/ws'),
   );
 
   channel.stream.listen(
@@ -41,27 +42,32 @@ void main() async {
   var data = {'type': 'init', 'id': id};
   channel.sink.add(json.encode(data));
 
-
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
-  
+
   final ThemeData theme = ThemeData();
   runApp(MaterialApp(
     title: "Exercise Correction - Pose Estimateion",
     theme: theme.copyWith(
-      primaryColor: kPrimaryColor,
-      colorScheme: theme.colorScheme.copyWith(secondary: kPrimaryColor, primary: kPrimaryColor),
-      visualDensity: VisualDensity.adaptivePlatformDensity
-    ),
+        primaryColor: kPrimaryColor,
+        colorScheme: theme.colorScheme
+            .copyWith(secondary: kPrimaryColor, primary: kPrimaryColor),
+        visualDensity: VisualDensity.adaptivePlatformDensity),
     initialRoute: '/',
     routes: {
-      '/': (context) =>  HomeScreen(),
-      '/cameraScreen/armcurl': (context) =>
-          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType:"armcurl"),
-      '/cameraScreen/armraise': (context) =>
-          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "armraise"),
-      '/cameraScreen/pushup': (context) =>
-          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "pushup")
+      '/': (context) => HomeScreen(),
+      '/cameraScreen/armcurl': (context) => CameraScreen(
+          camera: firstCamera,
+          channel: channel,
+          id: id,
+          exerciseType: "armcurl"),
+      '/cameraScreen/armraise': (context) => CameraScreen(
+          camera: firstCamera,
+          channel: channel,
+          id: id,
+          exerciseType: "armraise"),
+      '/cameraScreen/pushup': (context) => CameraScreen(
+          camera: firstCamera, channel: channel, id: id, exerciseType: "pushup")
     },
   ));
 }
