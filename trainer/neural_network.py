@@ -15,7 +15,7 @@ input_layer = FCLayer(8, 16)
 middel_layer = FCLayer(16, 12)
 output_layer = FCLayer(12, 9)
 
-""" input_layer.weights = load('weights', 0)
+input_layer.weights = load('weights', 0)
 input_layer.bias = load('bias', 0)
 
 middel_layer.weights = load('weights', 1)
@@ -23,7 +23,7 @@ middel_layer.bias = load('bias', 1)
 
 output_layer.weights = load('weights', 2)
 output_layer.bias = load('bias', 2)
- """
+
 net = Network()
 net.add(input_layer)
 net.add(Activation_Layer(tanh, tanh_prime))
@@ -49,7 +49,7 @@ for train_index, test_index in kf5.split(range(len(dataset))):
     x_test = x_test.astype('float32')
 
     net.fit(x_train, y_train, epochs=10000,
-            learning_rate=0.05, save_weights=save)
+            learning_rate=0.025, save_weights=save)
     out = net.predict(x_test)
 
     count = 0
