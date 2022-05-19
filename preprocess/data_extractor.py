@@ -87,11 +87,11 @@ with open('preprocess/labels.json', 'w', encoding='utf-8') as f:
 
                             elif exercise_folder == 'pushup':
                                 arm_angle_list.append(calc.angle(
-                                    p[SHOULDER_LEFT], p[ELBOW_LEFT], p[WRIST_LEFT]))
+                                    p[SHOULDER_RIGHT], p[ELBOW_RIGHT], p[WRIST_RIGHT]))
                                 leg_angle_list.append(calc.angle(
-                                    p[ANKLE_LEFT], p[KNEE_LEFT], p[HIP_LEFT]))
+                                    p[ANKLE_RIGHT], p[KNEE_RIGHT], p[HIP_RIGHT]))
                                 hip_angle_list.append(calc.angle(
-                                    p[KNEE_LEFT], p[HIP_LEFT], p[SHOULDER_LEFT]))
+                                    p[KNEE_RIGHT], p[HIP_RIGHT], p[SHOULDER_RIGHT]))
 
                     except Exception as e:
                         # print(e)
