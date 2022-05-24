@@ -22,15 +22,12 @@ void main() async {
   final cameras = await availableCameras();
 
   final channel = WebSocketChannel.connect(
-    Uri.parse('ws://192.168.87.181:5000/ws'),
+    Uri.parse('ws://192.168.87.180:5000/ws'),
   );
 
-  channel.stream.listen(
-    (data) {
-      print(data);
-    },
-    onError: (error) => print(error),
-  );
+  String response = "haha";
+
+  
 
   var rng = Random();
   String id = "id:" +
@@ -38,13 +35,13 @@ void main() async {
       rng.nextInt(100000).toString() +
       rng.nextInt(10).toString();
 
+
   var data = {'type': 'init', 'id': id};
   channel.sink.add(json.encode(data));
 
 
   // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.first;
-  
+  final firstCamera = cameras.length > 1 ? cameras[1] : cameras.first;
   final ThemeData theme = ThemeData();
   runApp(MaterialApp(
     title: "Exercise Correction - Pose Estimateion",
@@ -57,11 +54,11 @@ void main() async {
     routes: {
       '/': (context) =>  HomeScreen(),
       '/cameraScreen/armcurl': (context) =>
-          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType:"armcurl"),
+          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType:"armcurl",),
       '/cameraScreen/armraise': (context) =>
-          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "armraise"),
+          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "armraise", ),
       '/cameraScreen/pushup': (context) =>
-          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "pushup")
+          CameraScreen(camera: firstCamera, channel: channel, id: id, exerciseType: "pushup", )
     },
   ));
 }
